@@ -97,7 +97,7 @@
 
 
   <meta name="description" content="Mathematical process about Deterministic Policy Gradient Algorithms.  目录1. Policy Gradient2. Stochastic Actor-Critic3. Gradients of Deterministic Policies4. Limit of the Stochastic Policy Gradient5. C">
-<meta name="keywords" content="reinforce learning">
+<meta name="keywords" content="Policy Gradient,Math">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Deterministic Policy Gradient Algorithms">
 <meta property="og:url" content="http://yoursite.com/2019/01/31/Deterministic-Policy-Gradient-Algorithms/index.html">
@@ -109,7 +109,7 @@
 <meta property="og:image" content="http://yoursite.com/2019/01/31/Deterministic-Policy-Gradient-Algorithms/OrnsteinUhlenbeckProcess2D_svg.png">
 <meta property="og:image" content="http://yoursite.com/2019/01/31/Deterministic-Policy-Gradient-Algorithms/DDPG_algorithm.png">
 <meta property="og:image" content="http://yoursite.com/2019/01/31/Deterministic-Policy-Gradient-Algorithms/DDPG_test.png">
-<meta property="og:updated_time" content="2019-01-31T11:18:03.339Z">
+<meta property="og:updated_time" content="2019-01-31T12:02:03.609Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Deterministic Policy Gradient Algorithms">
 <meta name="twitter:description" content="Mathematical process about Deterministic Policy Gradient Algorithms.  目录1. Policy Gradient2. Stochastic Actor-Critic3. Gradients of Deterministic Policies4. Limit of the Stochastic Policy Gradient5. C">
@@ -372,7 +372,7 @@
                 
               
 
-              <time title="Created: 2019-01-31 16:56:34 / Modified: 19:18:03" itemprop="dateCreated datePublished" datetime="2019-01-31T16:56:34+08:00">2019-01-31</time>
+              <time title="Created: 2019-01-31 16:56:34 / Modified: 20:02:03" itemprop="dateCreated datePublished" datetime="2019-01-31T16:56:34+08:00">2019-01-31</time>
             
 
             
@@ -382,6 +382,24 @@
             
           </span>
 
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/reinforce-learning/" itemprop="url" rel="index"><span itemprop="name">reinforce learning</span></a></span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -413,6 +431,7 @@
       
         <p>Mathematical process about Deterministic Policy Gradient Algorithms. </p>
 <h3 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h3><p>1. Policy Gradient<br>2. Stochastic Actor-Critic<br>3. Gradients of Deterministic Policies<br>4. Limit of the Stochastic Policy Gradient<br>5. Compatible Function Approximation<br>6. DDPG </p>
+<a id="more"></a>
 <h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><h4 id="符号"><a href="#符号" class="headerlink" title="符号"></a>符号</h4><p>$r_{t}^{\gamma}=\displaystyle \sum_{k=t}^{\infty}\gamma^{k-t}r(s_{k},\ a_{k})$,其中$0&lt;\gamma&lt;1$<br>$V^{\pi}(s)=\mathrm{E}\left[r_{1}^{\gamma}|S_{1}=s;\pi\right]$<br>$Q^{\pi}(s,\ a)= \mathrm{E}\left[r_{1}^{\gamma}|S_{1}=s,\ A_{1}=a;\pi\right]$  </p>
 <h4 id="常规条件"><a href="#常规条件" class="headerlink" title="常规条件"></a>常规条件</h4><p>常规条件A.1: $p(s’|s,\ a)$ , $\nabla_{a}p(s’|s,\ a)$ , $\mu_{\theta}(s)$ , $\nabla_{\theta}\mu_{\theta}(s)$ , $r(s,\ a)$ , $\nabla_{a}r(s,\ a)$ , $p_{1}(s)$ 对任意变量 $s, a, s’$连续。</p>
 <p>常规条件A.2: 存在 $b$ 和 $L$ 使得 $\displaystyle \sup_{s}p_{1}(s)&lt;b,\ \displaystyle \sup_{a,s,s},\ p(s’|s,\ a)&lt;b,\ \displaystyle \sup_{a,s}r(s,\ a)&lt;b,\ \displaystyle \sup_{a,s,s},\ ||\nabla_{a}p(s’|s,\ a)||&lt;L$, 并且 $\displaystyle \sup_{a,s}||\nabla_{a}r(s,\ a)||&lt;L$。</p>
@@ -614,10 +633,8 @@ g_{\theta}(s)&=\sup_{\sigma}\{\rho^{\pi_{\mu_{\theta},\sigma}}(s)\}\sup_{a\in C_
 \begin{align}
 \nabla_{w}MSE(\theta,\ w)&=0\\
 \mathrm{E}[\nabla_{\theta}\mu_{\theta}(s)\epsilon(s;\theta,\ w)]&=0\\
-\mathrm{E}[\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{w}(s,\ a)|_{a=\mu_{\theta}(s)}]&=
-\end{align}
-$$$$\mathrm{E}[\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}]
-$$$$=\nabla_{\theta}J_{\beta}(\mu_{\theta})\ or\ \nabla_{\theta}J(\mu_{\theta})</script><p>这时取 $Q^{w}(s,\ a)= (a-\mu_{\theta}(s))^{\mathrm{T}}\nabla_{\theta}\mu_{\theta}(s)^{\mathrm{T}}w+V^{v}(s)$ 能满足条件1。在使用Sarsa或Q-learning时有 $Q^{w}(s,\ a)\approx Q^{\mu}(s,\ a)$，因为平滑函数近似 $\nabla_{a}Q^{w}(s,\ a)|_{a=\mu_{\theta}(s)}\approx \nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}$。这样满足了条件2。</p>
+\mathrm{E}[\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{w}(s,\ a)|_{a=\mu_{\theta}(s)}]&=\\
+\mathrm{E}[\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}]&=\nabla_{\theta}J_{\beta}(\mu_{\theta})\ or\ \nabla_{\theta}J(\mu_{\theta})\end{align}</script><p>这时取 $Q^{w}(s,\ a)= (a-\mu_{\theta}(s))^{\mathrm{T}}\nabla_{\theta}\mu_{\theta}(s)^{\mathrm{T}}w+V^{v}(s)$ 能满足条件1。在使用Sarsa或Q-learning时有 $Q^{w}(s,\ a)\approx Q^{\mu}(s,\ a)$，因为平滑函数近似 $\nabla_{a}Q^{w}(s,\ a)|_{a=\mu_{\theta}(s)}\approx \nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}$。这样满足了条件2。</p>
 <h3 id="6-DDPG"><a href="#6-DDPG" class="headerlink" title="6. DDPG"></a>6. DDPG</h3><h4 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h4><p>1. 样本缓存池<br>2. 加目标网络，延迟更新：<br>$\theta^{Q’}\leftarrow\tau\theta^{Q}+(1-\tau)\theta^{Q’},\\<br>\theta^{\mu’}\leftarrow\tau\theta^{\mu}+(1-\tau)\theta^{\mu’}$<br>3. 加入探索噪声：<br>Ornstein-Uhlenbeck process，$dx_t=\theta(\mu-x_t)dt+\sigma dW_t$。这是一个随机微分函数。<br><img src="OrnsteinUhlenbeckProcess2D_svg.png" alt=""><br>其中$\theta=1.0,\ \sigma=300,\ \mu=(0,\ 0)$初始位置在$(10,\ 10)$。  </p>
 <p>4. 状态变量尺度不同：batch normalization<br>5. 用像素做输入。</p>
 <h4 id="伪代码"><a href="#伪代码" class="headerlink" title="伪代码"></a>伪代码</h4><p><img src="DDPG_algorithm.png" alt=""></p>
@@ -645,7 +662,9 @@ $$$$=\nabla_{\theta}J_{\beta}(\mu_{\theta})\ or\ \nabla_{\theta}J(\mu_{\theta})<
       
         <div class="post-tags">
           
-            <a href="/tags/reinforce-learning/" rel="tag"># reinforce learning</a>
+            <a href="/tags/Policy-Gradient/" rel="tag"># Policy Gradient</a>
+          
+            <a href="/tags/Math/" rel="tag"># Math</a>
           
         </div>
       
@@ -753,7 +772,9 @@ $$$$=\nabla_{\theta}J_{\beta}(\mu_{\theta})\ or\ \nabla_{\theta}J(\mu_{\theta})<
                     
                       
                     
-                    <span class="site-state-item-count">2</span>
+                      
+                    
+                    <span class="site-state-item-count">3</span>
                     <span class="site-state-item-name">categories</span>
                   </a>
                 </div>
@@ -772,7 +793,9 @@ $$$$=\nabla_{\theta}J_{\beta}(\mu_{\theta})\ or\ \nabla_{\theta}J(\mu_{\theta})<
                     
                       
                     
-                    <span class="site-state-item-count">3</span>
+                      
+                    
+                    <span class="site-state-item-count">4</span>
                     <span class="site-state-item-name">tags</span>
                   </a>
                 </div>
