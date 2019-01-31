@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-tw,en,default">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Mathematical process about Deterministic Policy Gradient Algorithms.  目录1. Policy Gradient2. Stochastic Actor-Critic3. Gradients of Deterministic Policies4. Limit of the Stochastic Policy Gradient5. C">
+<meta name="keywords" content="reinforce learning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Deterministic Policy Gradient Algorithms">
+<meta property="og:url" content="http://yoursite.com/2019/01/31/Deterministic-Policy-Gradient-Algorithms/index.html">
+<meta property="og:site_name" content="Chuse">
+<meta property="og:description" content="Mathematical process about Deterministic Policy Gradient Algorithms.  目录1. Policy Gradient2. Stochastic Actor-Critic3. Gradients of Deterministic Policies4. Limit of the Stochastic Policy Gradient5. C">
+<meta property="og:locale" content="zh-tw">
+<meta property="og:image" content="http://yoursite.com/2019/01/31/Deterministic-Policy-Gradient-Algorithms/delta_function.png">
+<meta property="og:image" content="http://yoursite.com/2019/01/31/Deterministic-Policy-Gradient-Algorithms/Figure1.png">
+<meta property="og:image" content="http://yoursite.com/2019/01/31/Deterministic-Policy-Gradient-Algorithms/OrnsteinUhlenbeckProcess2D_svg.png">
+<meta property="og:image" content="http://yoursite.com/2019/01/31/Deterministic-Policy-Gradient-Algorithms/DDPG_algorithm.png">
+<meta property="og:image" content="http://yoursite.com/2019/01/31/Deterministic-Policy-Gradient-Algorithms/DDPG_test.png">
+<meta property="og:updated_time" content="2019-01-31T11:18:03.339Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Deterministic Policy Gradient Algorithms">
+<meta name="twitter:description" content="Mathematical process about Deterministic Policy Gradient Algorithms.  目录1. Policy Gradient2. Stochastic Actor-Critic3. Gradients of Deterministic Policies4. Limit of the Stochastic Policy Gradient5. C">
+<meta name="twitter:image" content="http://yoursite.com/2019/01/31/Deterministic-Policy-Gradient-Algorithms/delta_function.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/01/31/Deterministic-Policy-Gradient-Algorithms/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Deterministic Policy Gradient Algorithms | Chuse</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-tw">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+    
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Chuse</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/31/Deterministic-Policy-Gradient-Algorithms/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ice Egg">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Chuse">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Deterministic Policy Gradient Algorithms
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-01-31 16:56:34 / Modified: 19:18:03" itemprop="dateCreated datePublished" datetime="2019-01-31T16:56:34+08:00">2019-01-31</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Mathematical process about Deterministic Policy Gradient Algorithms. </p>
+<h3 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h3><p>1. Policy Gradient<br>2. Stochastic Actor-Critic<br>3. Gradients of Deterministic Policies<br>4. Limit of the Stochastic Policy Gradient<br>5. Compatible Function Approximation<br>6. DDPG </p>
+<h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><h4 id="符号"><a href="#符号" class="headerlink" title="符号"></a>符号</h4><p>$r_{t}^{\gamma}=\displaystyle \sum_{k=t}^{\infty}\gamma^{k-t}r(s_{k},\ a_{k})$,其中$0&lt;\gamma&lt;1$<br>$V^{\pi}(s)=\mathrm{E}\left[r_{1}^{\gamma}|S_{1}=s;\pi\right]$<br>$Q^{\pi}(s,\ a)= \mathrm{E}\left[r_{1}^{\gamma}|S_{1}=s,\ A_{1}=a;\pi\right]$  </p>
+<h4 id="常规条件"><a href="#常规条件" class="headerlink" title="常规条件"></a>常规条件</h4><p>常规条件A.1: $p(s’|s,\ a)$ , $\nabla_{a}p(s’|s,\ a)$ , $\mu_{\theta}(s)$ , $\nabla_{\theta}\mu_{\theta}(s)$ , $r(s,\ a)$ , $\nabla_{a}r(s,\ a)$ , $p_{1}(s)$ 对任意变量 $s, a, s’$连续。</p>
+<p>常规条件A.2: 存在 $b$ 和 $L$ 使得 $\displaystyle \sup_{s}p_{1}(s)&lt;b,\ \displaystyle \sup_{a,s,s},\ p(s’|s,\ a)&lt;b,\ \displaystyle \sup_{a,s}r(s,\ a)&lt;b,\ \displaystyle \sup_{a,s,s},\ ||\nabla_{a}p(s’|s,\ a)||&lt;L$, 并且 $\displaystyle \sup_{a,s}||\nabla_{a}r(s,\ a)||&lt;L$。</p>
+<h4 id="模型性能"><a href="#模型性能" class="headerlink" title="模型性能"></a>模型性能</h4><script type="math/tex; mode=display">J(\pi_\theta)=\int_{\mathcal{S}}\rho^\pi(s)\int_{\mathcal{A}}\pi_\theta(s,\ a)r(s,\ a)dads=\mathbb{E}_{s\sim\rho^\pi,a\sim\pi_\theta}\left[r(s,\ a)\right]</script><p>其中$\rho^{\pi}(s’) := \int_{\mathcal{S}}\sum_{t=1}^{\infty}\gamma^{t-1}p_{1}(s)p(s\rightarrow s’,\ t,\ \pi)\mathrm{d}s$，成为折扣状态分布。论文中假设$\mathcal{A}=\mathbb{R}^m$，$\mathcal{S}$为$\mathbb{R}^b$的一个紧子集。有界闭集就是紧集。</p>
+<h3 id="1-Policy-Gradient"><a href="#1-Policy-Gradient" class="headerlink" title="1. Policy Gradient"></a>1. Policy Gradient</h3><script type="math/tex; mode=display">\nabla_{\theta}J(\pi_{\theta})=\int_{\mathcal{S}}\rho^{\pi}(s)\int_{\mathcal{A}}\nabla_{\theta}\pi_{\theta}(s,\ a)Q^{\pi}(s,\ a)d{\it a}d{\it s}=\mathrm{E}_{s\sim\rho^{\pi},a\sim\pi_{\theta}}\left[\nabla_{\theta}\log\pi_{\theta}(s,\ a)Q^{\pi}(s,\ a)\right]</script><p>$\it Proof.$ 首先，</p>
+<script type="math/tex; mode=display">V^{\pi}(s)=\int_{\mathcal{A}}\pi_\theta(s,\ a)Q^\pi(s,\ a)da</script><p>对$\theta$求导，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\nabla_{\theta}V^{\pi}(s)&=\int_{\mathcal{A}}\left[\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)+\pi_\theta(s,\ a)\nabla_{\theta}Q^\pi(s,\ a)\right]da\\
+&=\int_{\mathcal{A}}\left[\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)+\pi_\theta(s,\ a)\nabla_{\theta}\left[r(s,\ a)+\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ a)V^{\pi}(s')ds'\right]\right]da\\
+&=\int_{\mathcal{A}}\left[\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)+\pi_\theta(s,\ a)\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ a)\nabla_{\theta}V^{\pi}(s')ds'\right]da\tag{1}\\
+&=\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)da+\int_{\mathcal{S}}\gamma \int_{\mathcal{A}}\pi_\theta(s,\ a)p(s\rightarrow s',\ 1,\ a)da\nabla_{\theta}V^{\pi}(s')ds'\\
+&=\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)da+\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \pi)\nabla_{\theta}V^{\pi}(s')ds'\\
+&=\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)da+\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \pi)\int_{\mathcal{A}}\left[\nabla_{\theta}\pi_\theta(s',\ a)Q^\pi(s',\ a)+\pi_\theta(s',\ a)\nabla_{\theta}Q^\pi(s',\ a)\right]dads'\\
+&=\int_{\mathcal{S}}\sum_{k=0}^1 \left[\gamma^kp(s\rightarrow s',\ k,\ \pi)\right]\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s',\ a)Q^\pi(s',\ a)dads'+\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \pi)\int_{\mathcal{S}}\gamma p(s'\rightarrow s'',\ 1,\ \pi)\nabla_{\theta}V^{\pi}(s'')ds''ds'\\
+&=\int_{\mathcal{S}}\sum_{k=0}^1 \left[\gamma^kp(s\rightarrow s',\ k,\ \pi)\right]\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s',\ a)Q^\pi(s',\ a)dads'+\int_{\mathcal{S}}\gamma^2 \int_{\mathcal{S}}p(s\rightarrow s',\ 1,\ \pi)p(s'\rightarrow s'',\ 1,\ \pi)ds'\nabla_{\theta}V^{\pi}(s'')ds''\\
+&=\int_{\mathcal{S}}\sum_{k=0}^1 \left[\gamma^kp(s\rightarrow s',\ k,\ \pi)\right]\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s',\ a)Q^\pi(s',\ a)dads'+\int_{\mathcal{S}}\gamma^2 p(s\rightarrow s'',\ 2,\ \pi)\nabla_{\theta}V^{\pi}(s'')ds''\\
+&=\int_{\mathcal{S}}\sum_{k=0}^\infty \left[\gamma^kp(s\rightarrow s',\ k,\ \pi)\right]\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s',\ a)Q^\pi(s',\ a)dads'
+\end{align}</script><p>其中$p(s\rightarrow s’,\ k,\ \pi)$为在策略$\pi_\theta$下从$s$开始经过k步到底$s’$的概率。另外在 (1) 处使用了莱布尼茨变限积分求导规则。因此有，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\nabla_{\theta}J(\pi_{\theta})&=\nabla_{\theta}\int_\mathcal{S}p_1(s)V^\pi(s)ds\tag{2}\\
+&=\int_{\mathcal{S}}\left[\int_\mathcal{S}\sum_{k=0}^\infty\gamma^kp_1(s)p(s\rightarrow s',\ k,\ \pi)ds\right]\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s',\ a)Q^\pi(s',\ a)dads'\\
+&=\int_{\mathcal{S}}\rho^\pi(s)\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)dads\\
+&=\int_{\mathcal{S}}\rho^\pi(s)\int_{\mathcal{A}}\pi_\theta(s,\ a)\frac{\nabla_{\theta}\pi_\theta(s,\ a)}{\pi_\theta(s,\ a)}Q^\pi(s,\ a)dads\\
+&=\int_{\mathcal{S}}\rho^\pi(s)\int_{\mathcal{A}}\pi_\theta(s,\ a)\nabla_{\theta}\log\pi_\theta(s,\ a)Q^\pi(s,\ a)dads\\
+&=\mathrm{E}_{s\sim\rho^{\pi},a\sim\pi_{\theta}}\left[\nabla_{\theta}\log\pi_{\theta}(s,\ a)Q^{\pi}(s,\ a)\right]
+\end{align}</script><p>另外在 (2) 处使用了莱布尼茨变限积分求导规则。</p>
+<h3 id="2-Stochastic-Actor-Critic"><a href="#2-Stochastic-Actor-Critic" class="headerlink" title="2. Stochastic Actor-Critic"></a>2. Stochastic Actor-Critic</h3><p>i) $Q^{w}(s,\ a) =\nabla_{\theta}\log\pi_{\theta}(s,\ a)^{\mathrm{T}}w$ 并且 ii) 参数 $w$ 最小化了平方误差 $\epsilon^{2}(w)=\mathrm{E}_{s\sim\rho^{\pi}, a\sim\pi_{\theta}}[(Q^{w}(s,\ a)-Q^{\pi}(s,\ a))^{2}]$，下面的梯度是无偏的，</p>
+<script type="math/tex; mode=display">\nabla_{\theta}J(\pi_{\theta})=\mathrm{E}_{s\sim\rho^{\pi},a\sim\pi_{\theta}}\left[\nabla_{\theta}\log\pi_{\theta}(s,\ a)Q^{w}(s,\ a)\right]</script><p>$\it Proof.$<br>由于$w$ 最小化了平方误差 $\epsilon^{2}(w)=\mathrm{E}_{s\sim\rho^{\pi}}, a\sim\pi_{\theta}\left[(Q^{w}(s,\ a)-Q^{\pi}(s,\ a))^{2}\right]$，故，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+&\int_{\mathcal{S}}\rho^\pi(s)\int_{\mathcal{A}}\pi_\theta(s,\ a)\left[Q^\pi(s,\ a)-Q^w(s,\ a)\right]\nabla_wQ^{w}(s,\ a)dads\\
+&=\mathrm{E}_{s\sim\rho^{\pi}, a\sim\pi_{\theta}}\left[\left(Q^\pi(s,\ a)-Q^w(s,\ a)\right)\nabla_wQ^{w}(s,\ a)\right]\\
+&=0
+\end{align}</script><p>由于$Q^{w}(s,\ a) =\nabla_{\theta}\log\pi_{\theta}(s,\ a)^{\mathrm{T}}w$，将$\nabla_w Q^w(s,\ a)=\nabla_{\theta}\log\pi_{\theta}(s,\ a)$带入上式得到，</p>
+<script type="math/tex; mode=display">\mathrm{E}_{s\sim\rho^{\pi}, a\sim\pi_{\theta}}\left[\log\pi_{\theta}(s,\ a)Q^\pi(s,\ a)\nabla_{\theta}\right]=\mathrm{E}_{s\sim\rho^{\pi}, a\sim\pi_{\theta}}\left[\log\pi_{\theta}(s,\ a)Q^w(s,\ a)\nabla_{\theta}\right]=\nabla_\theta J(\pi_\theta)</script><h3 id="3-Gradients-of-Deterministic-Policies"><a href="#3-Gradients-of-Deterministic-Policies" class="headerlink" title="3. Gradients of Deterministic Policies"></a>3. Gradients of Deterministic Policies</h3><script type="math/tex; mode=display">
+\begin{align}
+\displaystyle \nabla_{\theta}J(\mu_{\theta})&=\int_{\mathcal{S}}\rho^{\mu}(s)\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}\mathrm{d}s\\
+&=\mathrm{E}_{s\sim\rho^{\mu}}\left[\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}\right]
+\end{align}</script><p>$\it Proof.$上面的常规条件保证了下面都是可积分和可微分的，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\nabla_{\theta}V^{\mu_{\theta}}(s)&=\nabla_{\theta}Q^{\mu_{\theta}}(s,\ \mu_{\theta}(s))\\
+&=\nabla_{\theta}(r(s,\ \mu_{\theta}(s))+\int_{\mathcal{S}}\gamma p(s'|s,\ \mu_{\theta}(s))V^{\mu_{\theta}}(s')\mathrm{d}s')\\
+&=\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}r(s,\ a)|_{a=\mu_{\theta}(s)}+\nabla_{\theta}\int_{\mathcal{S}}\gamma p(s'|s,\ \mu_{\theta}(s))V^{\mu_{\theta}}(s')\mathrm{d}s'\\
+&=\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}r(s,\ a)|_{a=\mu_{\theta}(s)}\\
+&\ \ \ \ +\displaystyle \int_{\mathcal{S}}\gamma(p(s'|s,\ \mu_{\theta}(s))\nabla_{\theta}V^{\mu_{\theta}}(s')+\gamma\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}p(s'|s,\ a)|_{a=\mu_{\theta}(s)}V^{\mu_{\theta}}(s'))ds'\tag{3}\\
+&=\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}\left(r(s,\ a)+\int_{\mathcal{S}}\gamma p(s'|s,\ a)V^{\mu_{\theta}}(s')\mathrm{d}s'\right)|_{a=\mu_{\theta}(s)}\\
+&\ \ \ \ +\int_{\mathcal{S}}\gamma p(s'|s,\ \mu_{\theta}(s))\nabla_{\theta}V^{\mu_{\theta}}(s')\mathrm{d}s'\\
+&=\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu_{\theta}}(s,\ a)|_{a=\mu_{\theta}(s)}+\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \mu_{\theta})\nabla_{\theta}V^{\mu_{\theta}}(s')\mathrm{d}s'.
+\end{align}</script><p>在 (3) 处使用了莱布尼茨变限积分求导规则。重复上面的过程得到，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+&=\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu_{\theta}}(s,\ a)|_{a=\mu_{\theta}(s)}\\
+&\ \ \ \ +\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \mu_{\theta})\nabla_{\theta}\mu_{\theta}(s')\nabla_{a}Q^{\mu_{\theta}}(s',\ a)|_{a=\mu_{\theta}(s')}\mathrm{d}s'\\
+&\ \ \ \ +\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \mu_{\theta})\int_{\mathcal{S}}\gamma p(s'\rightarrow s''\ 1,\ \mu_{\theta})\nabla_{\theta}V^{\mu_{\theta}}(s'')\mathrm{d}s''\mathrm{d}s'\\
+&=\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu_{\theta}}(s,\ a)|_{a=\mu_{\theta}(s)}\\
+&\ \ \ \ +\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \mu_{\theta})\nabla_{\theta}\mu_{\theta}(s')\nabla_{a}Q^{\mu_{\theta}}(s',\ a)|_{a=\mu_{\theta}(s')}\mathrm{d}s'\\
+&\ \ \ \ +\displaystyle \int_{\mathcal{S}}\gamma^{2}p(s\rightarrow s',\ 2,\ \mu_{\theta})\nabla_{\theta}V^{\mu_{\theta}}(s')\mathrm{d}s'\tag{4}\\
+\vdots\\
+&=\int_{\mathcal{S}}\sum_{t=0}^{\infty}\gamma^{t}p(s\rightarrow s',\ t,\ \mu_{\theta})\nabla_{\theta}\mu_{\theta}(s')\nabla_{a}Q^{\mu_{\theta}}(s',\ a)|_{a=\mu_{\theta}(s')}\mathrm{d}s'.
+\end{align}</script><p>在 (4) 处使用了富比尼定理交换了积分次序。接下来，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\nabla_{\theta}J(\mu_{\theta})&=\nabla_{\theta}\int_{\mathcal{S}}p_{1}(s)V^{\mu_{\theta}}(s)\mathrm{d}s\\
+&=\displaystyle \int_{\mathcal{S}}p_{1}(s)\nabla_{\theta}V^{\mu_{\theta}}(s)\mathrm{d}s \tag{5}\\
+&=\displaystyle \int_{\mathcal{S}}\int_{\mathcal{S}}\sum_{t=0}^{\infty}\gamma^{t}p_{1}(s)p(s\rightarrow s',\ t,\ \mu_{\theta})\nabla_{\theta}\mu_{\theta}(s')\nabla_{a}Q^{\mu_{\theta}}(s',\ a)|_{a=\mu_{\theta}(s)}ds'ds\\
+&=\displaystyle \int_{\mathcal{S}}\rho^{\mu_{\theta}}(s)\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu_{\theta}}(s,\ a)|_{a=\mu_{\theta}(s)}ds\\
+&=\mathrm{E}_{s\sim\rho^{\mu_\theta}}\left[\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu_\theta}(s,\ a)|_{a=\mu_{\theta}(s)}\right]
+\end{align}</script><p>在 (5) 处使用了莱布尼茨变限积分求导规则。</p>
+<h3 id="4-Limit-of-the-Stochastic-Policy-Gradient"><a href="#4-Limit-of-the-Stochastic-Policy-Gradient" class="headerlink" title="4. Limit of the Stochastic Policy Gradient"></a>4. Limit of the Stochastic Policy Gradient</h3><h4 id="条件-B1"><a href="#条件-B1" class="headerlink" title="条件 B1:"></a>条件 B1:</h4><p>一个参数为 $\sigma$ 的函数 $\nu_{\sigma}$ 被称为在 $\mathcal{R}\subseteq \mathcal{A}$ 上的常规 delta近似要满足下面几个条件:</p>
+<p>1. 分布 $\nu_{\sigma}$ 收敛于delta分布，有性质: 当 $||\nabla_{a}f(a)||&lt;L&lt;\infty, \displaystyle \sup_{a}f(a)&lt;b&lt;\infty$，$\mathcal{F}$ 为 $L$-Lipschitz 和有界函数的分类:</p>
+<script type="math/tex; mode=display">
+\lim_{\sigma\downarrow 0}\sup_{f\in \mathcal{F},a\in A}\left|\int_{A}\nu_{\sigma}(a',\ a)f(a)da-f(a')\right|=0</script><p>2. 对于任意 $a’\in \mathcal{R}, \nu_{\sigma}(a’,\ \cdot)$ 被有Lipschitz边界的 $C_{a’}\subseteq \mathcal{A}$ 支撑，并且在 $C_{a’}$ 上连续可微。</p>
+<p>3. 对于任意 $a’\in \mathcal{R}$，$a\in \mathcal{A}$，梯度$\nabla_{a’}\nu_{\sigma}(a’,\ a)$ 存在。</p>
+<p>4. 对于全部 $a\in \mathcal{A},\ a’\in \mathcal{R}$，$\delta\in \mathbb{R}^{n}$ 有 $a+\delta\in \mathcal{A},\ a’+\delta\in \mathcal{A},<br>\nu(a’,\ a)=\nu(a’+\delta,\ a+\delta)$。</p>
+<p><img src="delta_function.png" alt=""></p>
+<h4 id="定理"><a href="#定理" class="headerlink" title="定理"></a>定理</h4><p>令 $\mu_{\theta}$ : $S\rightarrow A$，$\mu_{\theta}$ 的范围为 $\mathcal{R}_{\theta} :=\mathrm{r}\mathrm{a}\mathrm{n}\mathrm{g}\mathrm{e}(\mu_{\theta})\subseteq \mathcal{A}$，并且 $\displaystyle \mathcal{R}=\bigcup_{\theta}\mathcal{R}_{\theta}$。对于每一个 $\theta$, 随机策略 $\pi_{\mu_{\theta},\sigma}$ 表示为 $\pi_{\mu_{\theta},\sigma}(a|s)=\nu_{\sigma}(\mu_{\theta}(s),\ a)$ , $\nu_{\sigma}$ 在 $\mathcal{R}$ 满足条件 B1,则有,</p>
+<script type="math/tex; mode=display">\displaystyle \lim_{\sigma\downarrow 0}\nabla_{\theta}J(\pi_{\mu_{\theta},\sigma})=\nabla_{\theta}J(\mu_{\theta})</script><p>当 $\mathcal{A}=\mathbb{R}^{n}$: 时任意连续可微, 总积分为 1 ，并且紧支撑的 $\xi$ : $\mathbb{R}^{n}\rightarrow \mathbb{R}$, 能够构建出 $\nu_{\sigma}(a’,\ a)=1/\sigma^{n}\xi((a-a’)/\sigma)$，这满足条件B1。并且这样的函数范围很大：给出任意紧支撑这个函数都能构建出来。</p>
+<p>条件1，$\int_\mathcal{A}\nu_\delta(a’,\ a) da=\int_\mathcal{A}1/\sigma^{n}\xi((a-a’)/\sigma)da=\int_\mathcal{A}\xi((a-a’)/\sigma)d((a-a’)/\sigma)=1$，当$a-a’\neq 0$，存在$\sigma&gt;0$使得$(a-a’)/\sigma=0$，即$\lim_{\sigma\downarrow 0}(1/\sigma^{n}\xi((a-a’)/\sigma))=0$。$\lim_{\sigma\downarrow 0}\nu(a’,x)=\delta_a’(x)$。条件2,3,4显然成立。</p>
+<h4 id="引理1。"><a href="#引理1。" class="headerlink" title="引理1。"></a>引理1。</h4><p>当 $\mathcal{U}\times \mathcal{V}\subseteq \mathbb{R}^{n}\times \mathbb{R}^{n}$，并且 $\nu$ : $\mathcal{U}\times \mathcal{V}\rightarrow \mathbb{R}$ 在 $\mathcal{U}\times \mathcal{V}$上可微分。故有 $(A)\Leftrightarrow(B)\Rightarrow(C)$，</p>
+<p>(A) 对所有 $u\in \mathcal{U}, v\in \mathcal{V}$, $\delta\in \mathbb{R}^{n}$ 有 $u+\delta\in \mathcal{U}, v+\delta\in \mathcal{V}, \nu(u,\ v)=\nu(u+\delta,\ v+\delta)$。<br>(B) 存在函数 $\chi$ : $\mathbb{R}^{n}\rightarrow \mathbb{R}$ 有 $\nu(u,\ v)=\chi(u-v)$。<br>(C) $\nabla_{u}\nu(u,\ v)=-\nabla_{v}\nu(u,\ v)$，梯度处处存在。<br>另外，如果 $\mathcal{U}\times \mathcal{V}$ 是凸集，则有 $C\Rightarrow \mathrm{A}$。<br>引理${\it proof}$。<br>$\mathrm{A}\Rightarrow \mathrm{B}$: </p>
+<script type="math/tex; mode=display">
+\begin{align}
+\chi(u-v)&=\nu(u,\ u-(u-v))\\
+&=\nu(u,\ v)
+\end{align}</script><p>$\mathrm{B}\Rightarrow \mathrm{A}$:  </p>
+<script type="math/tex; mode=display">
+\begin{align}
+\nu(u,\ v)&=\chi(u-v)\\
+&=\chi((u+\delta)-(v+\delta))\\
+&=\nu(u+\delta,\ v+\delta)
+\end{align}</script><p>$\mathrm{B}\Rightarrow \mathrm{C}$: 令 $h(u,\ v)=u-v$ 根据链式法则，</p>
+<script type="math/tex; mode=display">\nabla_{u}u(u,\ v)=\nabla_{h}\chi(h)|_{h(u,v)}\nabla_{u}h(u,\ v)=\nabla_{h}\chi(h)|_{h(u,v)}= -\nabla_{h}\chi(h)|_{h(u,v)}\nabla_{v}h(u,\ v)=-\nabla_{v}\nu(u,\ v)</script><p>($\mathrm{C}$ 和凸集) $\Rightarrow \mathrm{A}$: 假设 $\mathcal{U}\times \mathcal{V}$ 是凸集。对任何 $(u,\ v)\in \mathcal{U}\times \mathcal{V}$, $\delta\in \mathbb{R}^{n}$, 有，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\langle\nabla_{(u,v)}\nu(u,\ v)\ ,\ (\delta,\ \delta)\rangle&=\langle\nabla_{u}\nu(u,\ v)\ ,\ \delta\rangle+\langle\nabla_{v}\nu(u,\ v)\ ,\ \delta\rangle\\
+&=\langle\nabla_{u}\nu(u,\ v)\ ,\ \delta\rangle-\langle\nabla_{u}\nu(u,\ v)\ ,\ \delta\rangle\\
+&=0
+\end{align}</script><p>因为 $\mathcal{U}\times \mathcal{V}$ 是凸集, 对任意 $A=(u,\ v)\in \mathcal{U}\times \mathcal{V}$ 和 $B=(u+\delta,\ v+\delta)\in \mathcal{U}\times \mathcal{V}$ 有直线连接 $A$ 和 $B$ ，这条直线式是完全包含在 $\mathcal{U}\times \mathcal{V}$中的。 因此 $\nu$ 沿着这条线就有 $\nu(A)=\nu(B)$。</p>
+<p><img src="Figure1.png" alt=""></p>
+<h4 id="引理2。"><a href="#引理2。" class="headerlink" title="引理2。"></a>引理2。</h4><p>1. 对于任意 $\pi,\ t,\ \displaystyle \sup_{s}p_{t}^{\pi}(s)&lt;b$。<br>2. 对于任意 $\pi, \displaystyle \sup_{s}\rho^{\pi}(s)&lt;b/(1-\gamma)$。<br>3. 对于任意 $\pi, \displaystyle \sup_{a,s}||\nabla_{a}Q^{\pi}(a,\ s)||&lt;c&lt;\infty$。<br>$\it Proof$. 1. 当 $t=1$ 常规条件 A.2, 当 $t\geq 1,$</p>
+<script type="math/tex; mode=display">
+\sup_{s'}p_{t+1}^{\pi}(s')=\sup_{s'}\int p_{t}^{\pi}(s)\int\pi_\theta(a,\ s)p(s'|s,\ a)dads=\sup_{s'}\mathrm{E}_{s\sim p_{t}^{\pi},a\sim\pi_{\theta}}\left[p(s'|s,\ a)\right]</script><script type="math/tex; mode=display">
+\leq\sup_{s,a,s}p(s'|s,\ a)<b</script><p>2. $\displaystyle \sup_{s}\rho^{\pi}(s)\leq\sum_{t=1}^{\infty}\gamma^{t-1}\sup_{s}p_{t}^{\pi}(s)\leq b/(1-\gamma)$<br>$\displaystyle \sup_{s}V^{\pi}(s)\leq\sum_{t=1}^{\infty}\gamma^{t-1}\sup_{s}r(s_{k},\ a_{k})\leq b/(1-\gamma)$</p>
+<p>3. 有,</p>
+<script type="math/tex; mode=display">
+\sup_{s,a}\left \|\nabla_{a}Q^{\pi}(a,\ s)\right \|\leq\sup_{s,a}\left \|\nabla_{a}r(s,\ a)\right \|+\gamma\sup_{s,a}\int\left \|\nabla_{a}p(s'|s,\ a)\right \|\left|V^{\pi}(s')\right|ds'</script><script type="math/tex; mode=display">
+\leq L+\gamma\int Lb/(1-\gamma)ds'</script><script type="math/tex; mode=display">
+<\infty</script><p>因为 $S$ 紧的，并且在 $S$ 上的积分时有限的。</p>
+<h4 id="引理3。"><a href="#引理3。" class="headerlink" title="引理3。"></a>引理3。</h4><p>$\displaystyle \lim_{\sigma\downarrow 0}\rho^{\pi_{\mu_{\theta},\sigma}}(s)=\rho^{\pi_{\mu_{\theta},0}}(s)$ 并且收敛是一致收敛,</p>
+<script type="math/tex; mode=display">\displaystyle \lim_{\sigma\downarrow 0}\sup_{s}|\rho^{\pi_{\mu_{\theta},\sigma}}(s)-\rho^{\pi_{\mu_{\theta},0}}(s)|=0</script><p>$\it Proof.$ 我们有 $\displaystyle \rho^{\pi}(s)=\sum_{t=1}^{\infty}\gamma^{t-1}p_{t}^{\pi}(s)$。显然有 $p_{1}^{\pi_{\mu_{\theta},\sigma}}(s)=p_{1}(s)=p_{1}^{\pi_{\mu_{\theta},0}}(s)$。对应 $\nu_{\sigma}$ 的定义，对应任意 $\epsilon_{1}&gt;0$ 存在 $\sigma^{*}$ 当 $\sigma&lt;\sigma^{*}$时，</p>
+<script type="math/tex; mode=display">\sup_{s}\left|\int\pi_{\mu_{\theta},\sigma}(a|s)p(s'|s,\ a)da-\int\pi_{\mu_{\theta},0}(a|s)p(s'|s,\ a)da\right|\leq\epsilon_{1}.</script><p>现在假设 $t\geq 1$ 时有</p>
+<script type="math/tex; mode=display">\sup_{s}\left|p_{t}^{\pi_{\mu_{\theta},\sigma}}(s)-p_{t}^{\pi_{\mu_{\theta},0}}(s)\right|\leq\epsilon_{2}(t)\ ,</script><p>则,</p>
+<script type="math/tex; mode=display">\begin{align}
+\sup_{s'}\left|p_{t+1}^{\pi_{\mu_{\theta},\sigma}}(s')-p_{t+1}^{\pi_{\mu_{\theta},0}}(s')\right|
+&\leq\sup_{s'}\left|\int\int p_{t}^{\pi_{\mu_{\theta},\sigma}}(s)\pi_{\mu_{\theta},\sigma}(a|s)p(s'|s,\ a)dads-\int\int p_{t}^{\pi_{\mu_{\theta},0}}(s)\pi_{\mu_{\theta},0}(a|s)p(s'|s,\ a)dads\right|\\
+&\leq\sup_{s'}\int\left|p_{t}^{\pi_{\mu_{\theta},\sigma}}(s)-p_{t}^{\pi_{\mu_{\theta},0}}(s)\right|\int\pi_{\mu_{\theta},\sigma}(a|s)p(s'|s,\ a)dads\\
+&+\sup_{s'}\int p_{t}^{\pi_{\mu_{\theta},0}}(s)\left|\int\pi_{\mu_{\theta},\sigma}(a|s)p(s'|s,\ a)da-\int\pi_{\mu_{\theta},0}(a|s)p(s'|s,\ a)da\right|ds\\
+&\leq\epsilon_{2}(t)\int bds+\epsilon_{1}\\
+&=\epsilon_{2}(t)b\zeta+\epsilon_{1},
+\end{align}</script><p>这里 $\displaystyle \zeta=\int 1ds&lt;\infty$. 因为 $\epsilon_{2}(1)=0$ 有，</p>
+<script type="math/tex; mode=display">\sup_{s}\left|p_{1}^{\pi_{\mu_{\theta},\sigma}}(s)-p_{1}^{\pi_{\mu_{\theta},0}}(s)\right|\leq 0\leq\epsilon_{1}</script><p>假设，</p>
+<script type="math/tex; mode=display">\sup_{s}\left|p_{t}^{\pi_{\mu_{\theta},\sigma}}(s)-p_{t}^{\pi_{\mu_{\theta},0}}(s)\right|\leq\epsilon_{1}(b\zeta+1)^{t-1}</script><p>t+1时，</p>
+<script type="math/tex; mode=display">\begin{align}
+\sup_{s}\left|p_{t+1}^{\pi_{\mu_{\theta},\sigma}}(s)-p_{t+1}^{\pi_{\mu_{\theta},0}}(s)\right|&\leq\epsilon_{1}(b\zeta+1)^{t-1}b\zeta+\epsilon_{1}\\
+&\leq\epsilon_{1}((b\zeta+1)^{t-1}b\zeta+1)\\
+&\leq\epsilon_{1}((b\zeta+1)^{t-1}b\zeta+(b\zeta+1)^{t-1})\\
+&\leq\epsilon_{1}(b\zeta+1)^{(t+1)-1}
+\end{align}</script><p>故有</p>
+<script type="math/tex; mode=display">\sup_{s}\left|p_{t}^{\pi_{\mu_{\theta},\sigma}}(s)-p_{t}^{\pi_{\mu_{\theta},0}}(s)\right|\leq\epsilon_{1}(b\zeta+1)^{t-1}</script><p>对于任意 $\epsilon&gt;0$ 可以选择一个足够大的 $T$ 使得 $\displaystyle \sum_{t=T+1}^{\infty}\gamma^{t-1}b&lt;\epsilon/2$ 然后选择 $\sigma^{*}$ 使得 $\epsilon_{1}$ 足够小使得 $\displaystyle \sum_{t=1}^{T}\gamma^{t-1}\epsilon_{1}(b\zeta+1)^{t-1}&lt;\epsilon/2$, 这样对应任意 $\sigma&lt;\sigma^{*}$ 有，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\sup_{s}\left|\rho^{\pi_{\mu_{\theta},\sigma}}(s)-\rho^{\pi_{\mu_{\theta},0}}(s)\right|&=\sup_{s}\left|\sum_{t=1}^{\infty}\gamma^{t-1}p_{t}^{\pi_{\mu_{\theta},\sigma}}(s)-\sum_{t=1}^{\infty}\gamma^{t-1}p_{t}^{\pi_{\mu_{\theta},0}}(s)\right|\\
+&\leq\sum_{t=1}^{T}\gamma^{t-1}\sup_{s}\left|p_{t}^{\pi_{\mu_{\theta},\sigma}}(s)-p_{t}^{\pi_{\mu_{\theta},0}}(s)\right|\\
+&+\sum_{t=T+1}^{\infty}\gamma^{t-1}\sup_{s}\left|p_{t}^{\pi_{\mu_{\theta},\sigma}}(s)-p_{t}^{\pi_{\mu_{\theta},0}}(s)\right|\\
+&\leq\sum_{t=1}^{T}\gamma^{t-1}\epsilon_{1}(b\zeta+1)^{t-1}+\sum_{t=1}^{\infty}\gamma^{t-1}b\\
+&\leq\epsilon
+\end{align}</script><h4 id="引理-4"><a href="#引理-4" class="headerlink" title="引理 4."></a>引理 4.</h4><p>对于所有 $s\in S,\ \theta$，当 $\sigma\rightarrow 0$ 时 $\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(a,\ s)\rightarrow\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(a,\ s)$，并且在 $(s,\ a)$ 上一致收敛。</p>
+<script type="math/tex; mode=display">\lim_{\sigma\downarrow 0}\sup_{(s,a)}\left\|\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(a,\ s)-\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(a,\ s)\right\|=0</script><p>$Proof.$ $\displaystyle \nabla_{a}Q^{\pi}(a,\ s)=\nabla_{a}(r(s,\ a)+\gamma\int p(s’|s,\ a)V^{\pi}(s’)ds’)$ ，所以有，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\sup_{(s,a)}\left\|\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(a,\ s)-\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(a,\ s)\right\|&\leq\gamma\int\sup_{(s,s',a)}\left\|\nabla_{a}p(s'|s,\ a)\right\|\left|V^{\pi_{\mu_{\theta},\sigma}}(s')-V^{\pi_{\mu_{\theta},0}}(s')\right|ds'\\
+&\leq\gamma\zeta L\sup_{s'}\left|V^{\pi_{\mu_{\theta},\sigma}}(s')-V^{\pi_{\mu_{\theta},0}}(s')\right|
+\end{align}</script><p>这里 $\displaystyle \zeta=\int 1ds&lt;\infty$. 对任意 $\epsilon_{1}, \epsilon_{2}$ 存在 $\sigma^{*}$ 对所有 $\sigma&lt;\sigma^{*}$ 都有，</p>
+<script type="math/tex; mode=display">\sup_{s}\left|\int r(s,\ a)(\pi_{\mu_{\theta},\sigma}(a|s)-\pi_{\mu_{\theta},0}(a|s))da\right|<\epsilon_{1}</script><p>和</p>
+<script type="math/tex; mode=display">\displaystyle \sup_{s,\hat{s}}\left|\rho_{\hat{s}}^{\pi_{\mu_{\theta},\sigma}}(s)-\rho_{\hat{s}}^{\pi_{\mu_{\theta},0}}(s)\right|<\epsilon_{2}</script><p>这里 $\rho_{\hat{s}}^{\pi}(s)$ 和 $\rho^{\pi}(s)$，相似，只是在 $t=1$ 时的分布是 $\displaystyle \int p(s|a,\hat{s})\pi(a|\hat{s})da$ 而不是 $p_{1}$。然后有，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\displaystyle \sup_{s'}\left|V^{\pi_{\mu_{\theta},\sigma}}(s')-V^{\pi_{\mu_{\theta},0}}(s')\right|&\leq\sup_{s'}\left|\int r(s',\ a)(\pi_{\mu_{\theta},\sigma}(a|s')-\pi_{\mu_{\theta},0}(a|s'))da\right|\\
+&\ \ \ \ +\displaystyle \gamma\sup_{s'}\left|\int\int\rho_{s'}^{\pi_{\mu_{\theta},\sigma}}(s)\pi_{\mu_{\theta},\sigma}(a|s)r(s,\ a)dads-\int\int\rho_{s'}^{\pi_{\mu_{\theta},0}}(s)\pi_{\mu_{\theta},0}(a|s)r(s,\ a)dads\right|\\
+&\leq\epsilon_{1}+\sup_{s'}\int\int\left|\rho_{s'}^{\pi_{\mu_{\theta},\sigma}}(s)-\rho_{s'}^{\pi_{\mu_{\theta},0}}(s)\right|\left|r(s,\ a)\right|\pi_{\mu_{\theta},\sigma}(a|s)dads\\
+&\ \ \ \ +\left|\sup_{s'}\int\rho_{s'}^{\pi_{\mu_{\theta},0}}(s)\int r(s,\ a)(\pi_{\mu_{\theta},\sigma}(a|s)-\pi_{\mu_{\theta},0}(a|s))dads\right|\\
+&\leq\epsilon_{1}+\epsilon_{2}\zeta b+\epsilon_{1}/(1-\gamma)
+\end{align}</script><p>其中，$\displaystyle \sup_{s}\int\rho^{\pi}(s)ds\leq\sum_{t=1}^{\infty}\gamma^{t-1}\sup_{s}\int p_{t}^{\pi}(s)ds\leq 1/(1-\gamma)$ 。最后要通过选择 $\sigma$ 就可以任意小。</p>
+<h4 id="证明极限要用到的定理总结："><a href="#证明极限要用到的定理总结：" class="headerlink" title="证明极限要用到的定理总结："></a>证明极限要用到的定理总结：</h4><p>B1条件：</p>
+<script type="math/tex; mode=display">
+\lim_{\sigma\downarrow 0}\int_{A}\nu_{\sigma}(a',\ a)f(a)da=f(a')</script><p>引理1:</p>
+<script type="math/tex; mode=display">\nabla_{u}\nu(u,\ v)=-\nabla_{v}\nu(u,\ v)</script><p>引理3：</p>
+<script type="math/tex; mode=display">\lim_{\sigma\downarrow 0}\rho^{\pi_{\mu_{\theta},\sigma}}(s)=\rho^{\pi_{\mu_{\theta},0}}(s)</script><p>引理4：</p>
+<script type="math/tex; mode=display">
+\lim_{\sigma\downarrow 0}\sup_{(s,a)}\left\|\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(a,\ s)-\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(a,\ s)\right\|=0</script><h4 id="it-proof-理论。"><a href="#it-proof-理论。" class="headerlink" title="$\it proof$ 理论。"></a>$\it proof$ 理论。</h4><p>由于引理1中 $\nabla_{a’}\nu_{\sigma}(a’,\ a)|_{a’=\mu_{\theta}(s)}=-\nabla_{a}\nu_{\sigma}(\mu_{\theta}(s),\ a)$ . 所以有,</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\displaystyle \int_{A}Q^{\pi_{\mu_{\theta,\sigma}}}(s,\ a)\nabla_{a'}\nu_{\sigma}(a',\ a)|_{a'=\mu_{\theta}(s)} da &=-\displaystyle \int_{A}Q^{\pi_{\mu_{\theta,\sigma}}}(s,\ a)\nabla_{a}\nu_{\sigma}(\mu_{\theta}(s),\ a)\mathrm{d}a\\
+&=\displaystyle \int_{C_{\mu_{\theta}(\mathrm{s})}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)\mathrm{d}a+ boundary\ terms\\
+&=\int_{C_{\mu_{\theta}(\mathrm{s})}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)\mathrm{d}a
+\end{align}</script><p>因为 $\nu_{\sigma}$ 在边界上消失了所以boundary terms为零。对于随机策略有，</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\displaystyle \lim_{\sigma\downarrow 0}\nabla_{\theta}J(\pi_{\mu_{\theta},\sigma})&=\lim_{\sigma\downarrow 0}\int_{\mathcal{S}}\rho^{\pi_{\mu_{\theta},\sigma}}(s)\int_{A}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nabla_{\theta}\pi_{\mu_{\theta},\sigma}(a|s)dads\\
+&=\displaystyle \lim_{\sigma\downarrow 0}\int_{\mathcal{S}}\rho^{\pi_{\mu_{\theta},\sigma}}(s)\int_{A}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nabla_{\theta}\mu_{\theta}(s)\nabla_{a'}\nu_{\sigma}(a',\ a)|_{a=\mu_{\theta}(s)}dads\\
+&=\displaystyle \lim_{\sigma\downarrow 0}\int_{\mathcal{S}}\rho^{\pi_{\mu_{\theta},\sigma}}(s)\nabla_{\theta}\mu_{\theta}(s)\int_{C_{\mu_{\theta}(s)}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)dads\\
+&=\displaystyle \int_{\mathcal{S}}\lim_{\sigma\downarrow 0}\rho^{\pi_{\mu_{\theta},\sigma}}(s)\nabla_{\theta}\mu_{\theta}(s)\int_{C_{\mu_{\theta}(s)}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)dads\tag{5}
+\end{align}</script><p>在 (5) 按照显著收敛理论交换了积分和极线。根据引理显著函数为,</p>
+<script type="math/tex; mode=display">
+\begin{align}
+g_{\theta}(s)&=\sup_{\sigma}\{\rho^{\pi_{\mu_{\theta},\sigma}}(s)\}\sup_{a\in C_{\mu_{\theta}(s)},\sigma}\{\left\|\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(a,\ s)\right\|\}\left\|\nabla_{\theta}\mu_{\theta}(s)\right\|_{\mathrm{o}\mathrm{p}}\\
+&\displaystyle \geq\left\|\rho^{\pi_{\mu_{\theta},\sigma}}(s)\int_{C_{\mu_{\theta}(s)}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)\mathrm{d}a\nabla_{\theta}\mu_{\theta}(s)\right\|\tag{6}
+\end{align}</script><p>这里 $||\cdot||_{\mathrm{o}\mathrm{p}}$ 表示 operator norm, 或是最大的奇异值。<br>operator norm的定义: $\left|A\right|_{op}=\inf\{c\geq 0:\left|A\nu\right|\leq c\left|\nu\right|\ for\ all\ \nu\in\mathcal{V}\}$<br>引理4中证明了 $\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)$ 的一致收敛，对应任意 $\epsilon_{1}, \epsilon_{2}$ 存在 $\sigma^{<em>}$ 对应任意 $\sigma&lt;\sigma^{</em>}$ 有，</p>
+<script type="math/tex; mode=display">
+\left\|\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)-\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(s,\ a)\right\|<\epsilon_{1}</script><p>所以有，</p>
+<script type="math/tex; mode=display">
+\left\|\int_{C_{\mu_{\theta}(s)}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)\mathrm{d}a-\int_{C_{\mu_{\theta}(s)}}\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)\mathrm{d}a\right\|<\epsilon_{1},</script><p>又因为有(B1),</p>
+<script type="math/tex; mode=display">
+\left\|\int_{C_{\mu_{\theta}(s)}}\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)\mathrm{d}a-\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(s,\ a)|_{a=\mu_{\theta}(s)}\right\|<\epsilon_{2}.</script><p>因此,</p>
+<script type="math/tex; mode=display">
+\left\|\int_{C_{\mu_{\theta}(s)}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)\mathrm{d}a-\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(s,\ a)|_{a=\mu_{\theta}(s)}\right\|<\epsilon_{1}+\epsilon_{2}</script><p>从这里和引理3可以得到,</p>
+<script type="math/tex; mode=display">
+\begin{align}
+(5)&=\displaystyle \int_{\mathcal{S}}\rho^{\pi_{\mu_{\theta},0}}(s)\nabla_{\theta}\mu_{\theta}(s)\lim_{\sigma\downarrow 0}\int_{C_{\mu_{\theta}(s)}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)d{\it a}ds\\
+&=\int_{\mathcal{S}}\rho^{\pi_{\mu_{\theta},0}}(s)\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(s,\ a)|_{a=\mu_{\theta}(s)}\mathrm{d}s\\
+&=\int_{\mathcal{S}}\rho^{\mu_{\theta}}(s)\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu_{\theta}}(s,\ a)|_{a=\mu_{\theta}(s)}\mathrm{d}s
+\end{align}</script><h3 id="5-Compatible-Function-Approximation"><a href="#5-Compatible-Function-Approximation" class="headerlink" title="5. Compatible Function Approximation"></a>5. Compatible Function Approximation</h3><p>近似函数 $Q^{w}(s,\ a)$ 可兼容的条件，</p>
+<p>1. $\nabla_{a}Q^{w}(s,\ a)|_{a=\mu_{\theta}(s)}=\nabla_{\theta}\mu_{\theta}(s)^{\mathrm{T}}w$<br>2. $w$ 最小化了平方差 $MSE(\theta,\ w)= \mathrm{E}[\epsilon(s;\theta,\ w)^{\mathrm{T}}\epsilon(s;\theta,\ w)]$ 其中 $\epsilon(s;\theta,\ w) =\nabla_{a}Q^{w}(s,\ a)|_{a=\mu_{\theta}(s)}-\nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}$  </p>
+<p>$\it Proof$. 如果 $w$ 最小化了 $MSE$，这时 $\epsilon^{2}$ 相对于 $w$ 的梯度必须为零。又因为条件1有 $\nabla_{w}\epsilon(s;\theta,\ w)=\nabla_{\theta}\mu_{\theta}(s)$ ,</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\nabla_{w}MSE(\theta,\ w)&=0\\
+\mathrm{E}[\nabla_{\theta}\mu_{\theta}(s)\epsilon(s;\theta,\ w)]&=0\\
+\mathrm{E}[\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{w}(s,\ a)|_{a=\mu_{\theta}(s)}]&=
+\end{align}
+$$$$\mathrm{E}[\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}]
+$$$$=\nabla_{\theta}J_{\beta}(\mu_{\theta})\ or\ \nabla_{\theta}J(\mu_{\theta})</script><p>这时取 $Q^{w}(s,\ a)= (a-\mu_{\theta}(s))^{\mathrm{T}}\nabla_{\theta}\mu_{\theta}(s)^{\mathrm{T}}w+V^{v}(s)$ 能满足条件1。在使用Sarsa或Q-learning时有 $Q^{w}(s,\ a)\approx Q^{\mu}(s,\ a)$，因为平滑函数近似 $\nabla_{a}Q^{w}(s,\ a)|_{a=\mu_{\theta}(s)}\approx \nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}$。这样满足了条件2。</p>
+<h3 id="6-DDPG"><a href="#6-DDPG" class="headerlink" title="6. DDPG"></a>6. DDPG</h3><h4 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h4><p>1. 样本缓存池<br>2. 加目标网络，延迟更新：<br>$\theta^{Q’}\leftarrow\tau\theta^{Q}+(1-\tau)\theta^{Q’},\\<br>\theta^{\mu’}\leftarrow\tau\theta^{\mu}+(1-\tau)\theta^{\mu’}$<br>3. 加入探索噪声：<br>Ornstein-Uhlenbeck process，$dx_t=\theta(\mu-x_t)dt+\sigma dW_t$。这是一个随机微分函数。<br><img src="OrnsteinUhlenbeckProcess2D_svg.png" alt=""><br>其中$\theta=1.0,\ \sigma=300,\ \mu=(0,\ 0)$初始位置在$(10,\ 10)$。  </p>
+<p>4. 状态变量尺度不同：batch normalization<br>5. 用像素做输入。</p>
+<h4 id="伪代码"><a href="#伪代码" class="headerlink" title="伪代码"></a>伪代码</h4><p><img src="DDPG_algorithm.png" alt=""></p>
+<h4 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h4><p><img src="DDPG_test.png" alt=""><br>亮灰色：使用batch normalization的原始DPG。<br>暗灰色：有目标网络。<br>绿色：有目标网络和batch normalization。<br>蓝色：像素输入和目标网络。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/reinforce-learning/" rel="tag"># reinforce learning</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/31/FPMR/" rel="next" title="FPMR">
+                <i class="fa fa-chevron-left"></i> FPMR
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ice Egg</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#目录"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定义"><span class="nav-number">2.</span> <span class="nav-text">定义</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#符号"><span class="nav-number">2.1.</span> <span class="nav-text">符号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#常规条件"><span class="nav-number">2.2.</span> <span class="nav-text">常规条件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#模型性能"><span class="nav-number">2.3.</span> <span class="nav-text">模型性能</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Policy-Gradient"><span class="nav-number">3.</span> <span class="nav-text">1. Policy Gradient</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Stochastic-Actor-Critic"><span class="nav-number">4.</span> <span class="nav-text">2. Stochastic Actor-Critic</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Gradients-of-Deterministic-Policies"><span class="nav-number">5.</span> <span class="nav-text">3. Gradients of Deterministic Policies</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Limit-of-the-Stochastic-Policy-Gradient"><span class="nav-number">6.</span> <span class="nav-text">4. Limit of the Stochastic Policy Gradient</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#条件-B1"><span class="nav-number">6.1.</span> <span class="nav-text">条件 B1:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#定理"><span class="nav-number">6.2.</span> <span class="nav-text">定理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#引理1。"><span class="nav-number">6.3.</span> <span class="nav-text">引理1。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#引理2。"><span class="nav-number">6.4.</span> <span class="nav-text">引理2。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#引理3。"><span class="nav-number">6.5.</span> <span class="nav-text">引理3。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#引理-4"><span class="nav-number">6.6.</span> <span class="nav-text">引理 4.</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#证明极限要用到的定理总结："><span class="nav-number">6.7.</span> <span class="nav-text">证明极限要用到的定理总结：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#it-proof-理论。"><span class="nav-number">6.8.</span> <span class="nav-text">$\it proof$ 理论。</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Compatible-Function-Approximation"><span class="nav-number">7.</span> <span class="nav-text">5. Compatible Function Approximation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-DDPG"><span class="nav-number">8.</span> <span class="nav-text">6. DDPG</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#改进"><span class="nav-number">8.1.</span> <span class="nav-text">改进</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#伪代码"><span class="nav-number">8.2.</span> <span class="nav-text">伪代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实验"><span class="nav-number">8.3.</span> <span class="nav-text">实验</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ice Egg</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v6.7.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=6.7.0"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+      for (i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+<script src="//cdn.jsdelivr.net/npm/mathjax@2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<style>
+.MathJax_Display {
+  overflow: auto hidden;
+}
+</style>
+
+    
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
