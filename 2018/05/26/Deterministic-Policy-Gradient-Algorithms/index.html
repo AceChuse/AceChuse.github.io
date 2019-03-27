@@ -104,16 +104,16 @@
 <meta property="og:site_name" content="Chuse">
 <meta property="og:description" content="Mathematical process about Deterministic Policy Gradient Algorithms.  目录1. Policy Gradient2. Stochastic Actor-Critic3. Gradients of Deterministic Policies4. Limit of the Stochastic Policy Gradient5. C">
 <meta property="og:locale" content="zh-tw">
-<meta property="og:image" content="http://yoursite.com/2018/05/26/Deterministic-Policy-Gradient-Algorithms/delta_function.png">
-<meta property="og:image" content="http://yoursite.com/2018/05/26/Deterministic-Policy-Gradient-Algorithms/Figure1.png">
-<meta property="og:image" content="http://yoursite.com/2018/05/26/Deterministic-Policy-Gradient-Algorithms/OrnsteinUhlenbeckProcess2D_svg.png">
-<meta property="og:image" content="http://yoursite.com/2018/05/26/Deterministic-Policy-Gradient-Algorithms/DDPG_algorithm.png">
-<meta property="og:image" content="http://yoursite.com/2018/05/26/Deterministic-Policy-Gradient-Algorithms/DDPG_test.png">
-<meta property="og:updated_time" content="2019-03-27T06:30:58.041Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/delta_function.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/Figure1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/OrnsteinUhlenbeckProcess2D_svg.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/DDPG_algorithm.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/DDPG_test.png">
+<meta property="og:updated_time" content="2019-03-27T14:47:23.490Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Deterministic Policy Gradient Algorithms">
 <meta name="twitter:description" content="Mathematical process about Deterministic Policy Gradient Algorithms.  目录1. Policy Gradient2. Stochastic Actor-Critic3. Gradients of Deterministic Policies4. Limit of the Stochastic Policy Gradient5. C">
-<meta name="twitter:image" content="http://yoursite.com/2018/05/26/Deterministic-Policy-Gradient-Algorithms/delta_function.png">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/delta_function.png">
 
 
 
@@ -389,7 +389,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-03-27 14:30:58" itemprop="dateModified" datetime="2019-03-27T14:30:58+08:00">2019-03-27</time>
+                <time title="Modified: 2019-03-27 22:47:23" itemprop="dateModified" datetime="2019-03-27T22:47:23+08:00">2019-03-27</time>
               
             
           </span>
@@ -443,10 +443,11 @@
       
         <p>Mathematical process about Deterministic Policy Gradient Algorithms. </p>
 <h3 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h3><p>1. Policy Gradient<br>2. Stochastic Actor-Critic<br>3. Gradients of Deterministic Policies<br>4. Limit of the Stochastic Policy Gradient<br>5. Compatible Function Approximation<br>6. DDPG </p>
+<p>An example of DDPG on pendulum</p>
+<video src="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/ddpg_pendulum.mp4" width="480" height="270" controls controlslist="nodownload" loop="loop" autoplay="autoplay">
+</video>
+
 <a id="more"></a>
-<video src="ddpg_pendulum.mp4" width="320" height="180" controls="controls"></video>
-
-
 <h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><h4 id="符号"><a href="#符号" class="headerlink" title="符号"></a>符号</h4><p>$r_{t}^{\gamma}=\displaystyle \sum_{k=t}^{\infty}\gamma^{k-t}r(s_{k},\ a_{k})$,其中$0&lt;\gamma&lt;1$<br>$V^{\pi}(s)=\mathrm{E}\left[r_{1}^{\gamma}|S_{1}=s;\pi\right]$<br>$Q^{\pi}(s,\ a)= \mathrm{E}\left[r_{1}^{\gamma}|S_{1}=s,\ A_{1}=a;\pi\right]$  </p>
 <h4 id="常规条件"><a href="#常规条件" class="headerlink" title="常规条件"></a>常规条件</h4><p>常规条件A.1: $p(s’|s,\ a)$ , $\nabla_{a}p(s’|s,\ a)$ , $\mu_{\theta}(s)$ , $\nabla_{\theta}\mu_{\theta}(s)$ , $r(s,\ a)$ , $\nabla_{a}r(s,\ a)$ , $p_{1}(s)$ 对任意变量 $s, a, s’$连续。</p>
 <p>常规条件A.2: 存在 $b$ 和 $L$ 使得 $\displaystyle \sup_{s}p_{1}(s)&lt;b,\ \displaystyle \sup_{a,s,s},\ p(s’|s,\ a)&lt;b,\ \displaystyle \sup_{a,s}r(s,\ a)&lt;b,\ \displaystyle \sup_{a,s,s},\ ||\nabla_{a}p(s’|s,\ a)||&lt;L$, 并且 $\displaystyle \sup_{a,s}||\nabla_{a}r(s,\ a)||&lt;L$。</p>
@@ -524,7 +525,7 @@
 \lim_{\sigma\downarrow 0}\sup_{f\in \mathcal{F},a\in A}\left|\int_{A}\nu_{\sigma}(a',\ a)f(a)da-f(a')\right|=0</script><p>2. 对于任意 $a’\in \mathcal{R}, \nu_{\sigma}(a’,\ \cdot)$ 被有Lipschitz边界的 $C_{a’}\subseteq \mathcal{A}$ 支撑，并且在 $C_{a’}$ 上连续可微。</p>
 <p>3. 对于任意 $a’\in \mathcal{R}$，$a\in \mathcal{A}$，梯度$\nabla_{a’}\nu_{\sigma}(a’,\ a)$ 存在。</p>
 <p>4. 对于全部 $a\in \mathcal{A},\ a’\in \mathcal{R}$，$\delta\in \mathbb{R}^{n}$ 有 $a+\delta\in \mathcal{A},\ a’+\delta\in \mathcal{A},<br>\nu(a’,\ a)=\nu(a’+\delta,\ a+\delta)$。</p>
-<p><img src="delta_function.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/delta_function.png" alt=""></p>
 <h4 id="定理"><a href="#定理" class="headerlink" title="定理"></a>定理</h4><p>令 $\mu_{\theta}$ : $S\rightarrow A$，$\mu_{\theta}$ 的范围为 $\mathcal{R}_{\theta} :=\mathrm{r}\mathrm{a}\mathrm{n}\mathrm{g}\mathrm{e}(\mu_{\theta})\subseteq \mathcal{A}$，并且 $\displaystyle \mathcal{R}=\bigcup_{\theta}\mathcal{R}_{\theta}$。对于每一个 $\theta$, 随机策略 $\pi_{\mu_{\theta},\sigma}$ 表示为 $\pi_{\mu_{\theta},\sigma}(a|s)=\nu_{\sigma}(\mu_{\theta}(s),\ a)$ , $\nu_{\sigma}$ 在 $\mathcal{R}$ 满足条件 B1,则有,</p>
 <script type="math/tex; mode=display">\displaystyle \lim_{\sigma\downarrow 0}\nabla_{\theta}J(\pi_{\mu_{\theta},\sigma})=\nabla_{\theta}J(\mu_{\theta})</script><p>当 $\mathcal{A}=\mathbb{R}^{n}$: 时任意连续可微, 总积分为 1 ，并且紧支撑的 $\xi$ : $\mathbb{R}^{n}\rightarrow \mathbb{R}$, 能够构建出 $\nu_{\sigma}(a’,\ a)=1/\sigma^{n}\xi((a-a’)/\sigma)$，这满足条件B1。并且这样的函数范围很大：给出任意紧支撑这个函数都能构建出来。</p>
 <p>条件1，$\int_\mathcal{A}\nu_\delta(a’,\ a) da=\int_\mathcal{A}1/\sigma^{n}\xi((a-a’)/\sigma)da=\int_\mathcal{A}\xi((a-a’)/\sigma)d((a-a’)/\sigma)=1$，当$a-a’\neq 0$，存在$\sigma&gt;0$使得$(a-a’)/\sigma=0$，即$\lim_{\sigma\downarrow 0}(1/\sigma^{n}\xi((a-a’)/\sigma))=0$。$\lim_{\sigma\downarrow 0}\nu(a’,x)=\delta_a’(x)$。条件2,3,4显然成立。</p>
@@ -548,7 +549,7 @@
 &=\langle\nabla_{u}\nu(u,\ v)\ ,\ \delta\rangle-\langle\nabla_{u}\nu(u,\ v)\ ,\ \delta\rangle\\
 &=0
 \end{align}</script><p>因为 $\mathcal{U}\times \mathcal{V}$ 是凸集, 对任意 $A=(u,\ v)\in \mathcal{U}\times \mathcal{V}$ 和 $B=(u+\delta,\ v+\delta)\in \mathcal{U}\times \mathcal{V}$ 有直线连接 $A$ 和 $B$ ，这条直线式是完全包含在 $\mathcal{U}\times \mathcal{V}$中的。 因此 $\nu$ 沿着这条线就有 $\nu(A)=\nu(B)$。</p>
-<p><img src="Figure1.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/Figure1.png" alt=""></p>
 <h4 id="引理2。"><a href="#引理2。" class="headerlink" title="引理2。"></a>引理2。</h4><p>1. 对于任意 $\pi,\ t,\ \displaystyle \sup_{s}p_{t}^{\pi}(s)&lt;b$。<br>2. 对于任意 $\pi, \displaystyle \sup_{s}\rho^{\pi}(s)&lt;b/(1-\gamma)$。<br>3. 对于任意 $\pi, \displaystyle \sup_{a,s}||\nabla_{a}Q^{\pi}(a,\ s)||&lt;c&lt;\infty$。<br>$\it Proof$. 1. 当 $t=1$ 常规条件 A.2, 当 $t\geq 1,$</p>
 <script type="math/tex; mode=display">
 \sup_{s'}p_{t+1}^{\pi}(s')=\sup_{s'}\int p_{t}^{\pi}(s)\int\pi_\theta(a,\ s)p(s'|s,\ a)dads=\sup_{s'}\mathrm{E}_{s\sim p_{t}^{\pi},a\sim\pi_{\theta}}\left[p(s'|s,\ a)\right]</script><script type="math/tex; mode=display">
@@ -650,10 +651,10 @@ g_{\theta}(s)&=\sup_{\sigma}\{\rho^{\pi_{\mu_{\theta},\sigma}}(s)\}\sup_{a\in C_
 \mathrm{E}[\nabla_{\theta}\mu_{\theta}(s)\epsilon(s;\theta,\ w)]&=0\\
 \mathrm{E}[\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{w}(s,\ a)|_{a=\mu_{\theta}(s)}]&=\\
 \mathrm{E}[\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}]&=\nabla_{\theta}J_{\beta}(\mu_{\theta})\ or\ \nabla_{\theta}J(\mu_{\theta})\end{align}</script><p>这时取 $Q^{w}(s,\ a)= (a-\mu_{\theta}(s))^{\mathrm{T}}\nabla_{\theta}\mu_{\theta}(s)^{\mathrm{T}}w+V^{v}(s)$ 能满足条件1。在使用Sarsa或Q-learning时有 $Q^{w}(s,\ a)\approx Q^{\mu}(s,\ a)$，因为平滑函数近似 $\nabla_{a}Q^{w}(s,\ a)|_{a=\mu_{\theta}(s)}\approx \nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}$。这样满足了条件2。</p>
-<h3 id="6-DDPG"><a href="#6-DDPG" class="headerlink" title="6. DDPG"></a>6. DDPG</h3><h4 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h4><p>1. 样本缓存池<br>2. 加目标网络，延迟更新：<br>$\theta^{Q’}\leftarrow\tau\theta^{Q}+(1-\tau)\theta^{Q’},\\<br>\theta^{\mu’}\leftarrow\tau\theta^{\mu}+(1-\tau)\theta^{\mu’}$<br>3. 加入探索噪声：<br>Ornstein-Uhlenbeck process，$dx_t=\theta(\mu-x_t)dt+\sigma dW_t$。这是一个随机微分函数。<br><img src="OrnsteinUhlenbeckProcess2D_svg.png" alt=""><br>其中$\theta=1.0,\ \sigma=300,\ \mu=(0,\ 0)$初始位置在$(10,\ 10)$。  </p>
+<h3 id="6-DDPG"><a href="#6-DDPG" class="headerlink" title="6. DDPG"></a>6. DDPG</h3><h4 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h4><p>1. 样本缓存池<br>2. 加目标网络，延迟更新：<br>$\theta^{Q’}\leftarrow\tau\theta^{Q}+(1-\tau)\theta^{Q’},\\<br>\theta^{\mu’}\leftarrow\tau\theta^{\mu}+(1-\tau)\theta^{\mu’}$<br>3. 加入探索噪声：<br>Ornstein-Uhlenbeck process，$dx_t=\theta(\mu-x_t)dt+\sigma dW_t$。这是一个随机微分函数。<br><img src="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/OrnsteinUhlenbeckProcess2D_svg.png" alt=""><br>其中$\theta=1.0,\ \sigma=300,\ \mu=(0,\ 0)$初始位置在$(10,\ 10)$。  </p>
 <p>4. 状态变量尺度不同：batch normalization<br>5. 用像素做输入。</p>
-<h4 id="伪代码"><a href="#伪代码" class="headerlink" title="伪代码"></a>伪代码</h4><p><img src="DDPG_algorithm.png" alt=""></p>
-<h4 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h4><p><img src="DDPG_test.png" alt=""><br>亮灰色：使用batch normalization的原始DPG。<br>暗灰色：有目标网络。<br>绿色：有目标网络和batch normalization。<br>蓝色：像素输入和目标网络。</p>
+<h4 id="伪代码"><a href="#伪代码" class="headerlink" title="伪代码"></a>伪代码</h4><p><img src="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/DDPG_algorithm.png" alt=""></p>
+<h4 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h4><p><img src="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/DDPG_test.png" alt=""><br>亮灰色：使用batch normalization的原始DPG。<br>暗灰色：有目标网络。<br>绿色：有目标网络和batch normalization。<br>蓝色：像素输入和目标网络。</p>
 
       
     </div>
@@ -692,14 +693,18 @@ g_{\theta}(s)&=\sup_{\sigma}\{\rho^{\pi_{\mu_{\theta},\sigma}}(s)\}\sup_{a\in C_
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2018/05/17/Neural-Style-Transfer/" rel="next" title="Neural Style Transfer">
+                <i class="fa fa-chevron-left"></i> Neural Style Transfer
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/01/31/Neural-Style-Transfer/" rel="prev" title="Neural Style Transfer">
-                Neural Style Transfer <i class="fa fa-chevron-right"></i>
+              <a href="/2018/06/19/Face-application/" rel="prev" title="Face application">
+                Face application <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -770,7 +775,7 @@ g_{\theta}(s)&=\sup_{\sigma}\{\rho^{\pi_{\mu_{\theta},\sigma}}(s)\}\sup_{a\in C_
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-count">8</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
