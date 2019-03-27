@@ -100,7 +100,7 @@
 <meta name="keywords" content="Policy Gradient,Math">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Deterministic Policy Gradient Algorithms">
-<meta property="og:url" content="http://yoursite.com/2018/05/26/Deterministic-Policy-Gradient-Algorithms/index.html">
+<meta property="og:url" content="http://yoursite.com/2018/02/11/Deterministic-Policy-Gradient-Algorithms/index.html">
 <meta property="og:site_name" content="Chuse">
 <meta property="og:description" content="Mathematical process about Deterministic Policy Gradient Algorithms.  目录1. Policy Gradient2. Stochastic Actor-Critic3. Gradients of Deterministic Policies4. Limit of the Stochastic Policy Gradient5. C">
 <meta property="og:locale" content="zh-tw">
@@ -109,7 +109,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/OrnsteinUhlenbeckProcess2D_svg.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/DDPG_algorithm.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/DDPG_test.png">
-<meta property="og:updated_time" content="2019-03-27T14:47:23.490Z">
+<meta property="og:updated_time" content="2019-03-27T16:01:47.061Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Deterministic Policy Gradient Algorithms">
 <meta name="twitter:description" content="Mathematical process about Deterministic Policy Gradient Algorithms.  目录1. Policy Gradient2. Stochastic Actor-Critic3. Gradients of Deterministic Policies4. Limit of the Stochastic Policy Gradient5. C">
@@ -120,7 +120,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/05/26/Deterministic-Policy-Gradient-Algorithms/">
+  <link rel="canonical" href="http://yoursite.com/2018/02/11/Deterministic-Policy-Gradient-Algorithms/">
 
 
 
@@ -329,7 +329,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/26/Deterministic-Policy-Gradient-Algorithms/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/11/Deterministic-Policy-Gradient-Algorithms/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Ice Egg">
@@ -372,7 +372,7 @@
                 
               
 
-              <time title="Created: 2018-05-26 16:56:34" itemprop="dateCreated datePublished" datetime="2018-05-26T16:56:34+08:00">2018-05-26</time>
+              <time title="Created: 2018-02-11 10:15:34" itemprop="dateCreated datePublished" datetime="2018-02-11T10:15:34+08:00">2018-02-11</time>
             
 
             
@@ -389,7 +389,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-03-27 22:47:23" itemprop="dateModified" datetime="2019-03-27T22:47:23+08:00">2019-03-27</time>
+                <time title="Modified: 2019-03-28 00:01:47" itemprop="dateModified" datetime="2019-03-28T00:01:47+08:00">2019-03-28</time>
               
             
           </span>
@@ -655,6 +655,7 @@ g_{\theta}(s)&=\sup_{\sigma}\{\rho^{\pi_{\mu_{\theta},\sigma}}(s)\}\sup_{a\in C_
 <p>4. 状态变量尺度不同：batch normalization<br>5. 用像素做输入。</p>
 <h4 id="伪代码"><a href="#伪代码" class="headerlink" title="伪代码"></a>伪代码</h4><p><img src="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/DDPG_algorithm.png" alt=""></p>
 <h4 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h4><p><img src="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/DDPG_test.png" alt=""><br>亮灰色：使用batch normalization的原始DPG。<br>暗灰色：有目标网络。<br>绿色：有目标网络和batch normalization。<br>蓝色：像素输入和目标网络。</p>
+<p>Reference:<br><a href="http://proceedings.mlr.press/v32/silver14.pdf" target="_blank" rel="noopener">Deterministic Policy Gradient Algorithms.</a><br><a href="https://arxiv.org/abs/1509.02971" target="_blank" rel="noopener">Continuous control with deep reinforcement learning.</a></p>
 
       
     </div>
@@ -693,8 +694,8 @@ g_{\theta}(s)&=\sup_{\sigma}\{\rho^{\pi_{\mu_{\theta},\sigma}}(s)\}\sup_{a\in C_
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/05/17/Neural-Style-Transfer/" rel="next" title="Neural Style Transfer">
-                <i class="fa fa-chevron-left"></i> Neural Style Transfer
+              <a href="/2018/02/09/Hybrid-Reward-Architecture/" rel="next" title="Hybrid Reward Architecture">
+                <i class="fa fa-chevron-left"></i> Hybrid Reward Architecture
               </a>
             
           </div>
@@ -703,8 +704,8 @@ g_{\theta}(s)&=\sup_{\sigma}\{\rho^{\pi_{\mu_{\theta},\sigma}}(s)\}\sup_{a\in C_
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/06/19/Face-application/" rel="prev" title="Face application">
-                Face application <i class="fa fa-chevron-right"></i>
+              <a href="/2018/04/02/Deep-Q-Learning/" rel="prev" title="Deep Q-Learning">
+                Deep Q-Learning <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
