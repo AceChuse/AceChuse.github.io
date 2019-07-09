@@ -109,7 +109,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/OrnsteinUhlenbeckProcess2D_svg.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/DDPG_algorithm.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/DDPG_test.png">
-<meta property="og:updated_time" content="2019-03-27T16:01:47.061Z">
+<meta property="og:updated_time" content="2019-07-09T11:12:14.319Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Deterministic Policy Gradient Algorithms">
 <meta name="twitter:description" content="Mathematical process about Deterministic Policy Gradient Algorithms.  目录1. Policy Gradient2. Stochastic Actor-Critic3. Gradients of Deterministic Policies4. Limit of the Stochastic Policy Gradient5. C">
@@ -389,7 +389,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-03-28 00:01:47" itemprop="dateModified" datetime="2019-03-28T00:01:47+08:00">2019-03-28</time>
+                <time title="Modified: 2019-07-09 19:12:14" itemprop="dateModified" datetime="2019-07-09T19:12:14+08:00">2019-07-09</time>
               
             
           </span>
@@ -455,70 +455,76 @@
 <h3 id="1-Policy-Gradient"><a href="#1-Policy-Gradient" class="headerlink" title="1. Policy Gradient"></a>1. Policy Gradient</h3><script type="math/tex; mode=display">\nabla_{\theta}J(\pi_{\theta})=\int_{\mathcal{S}}\rho^{\pi}(s)\int_{\mathcal{A}}\nabla_{\theta}\pi_{\theta}(s,\ a)Q^{\pi}(s,\ a)d{\it a}d{\it s}=\mathrm{E}_{s\sim\rho^{\pi},a\sim\pi_{\theta}}\left[\nabla_{\theta}\log\pi_{\theta}(s,\ a)Q^{\pi}(s,\ a)\right]</script><p>$\it Proof.$ 首先，</p>
 <script type="math/tex; mode=display">V^{\pi}(s)=\int_{\mathcal{A}}\pi_\theta(s,\ a)Q^\pi(s,\ a)da</script><p>对$\theta$求导，</p>
 <script type="math/tex; mode=display">
-\begin{align}
-\nabla_{\theta}V^{\pi}(s)&=\int_{\mathcal{A}}\left[\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)+\pi_\theta(s,\ a)\nabla_{\theta}Q^\pi(s,\ a)\right]da\\
+\begin{split}
+&\nabla_{\theta}V^{\pi}(s)\\
+&=\int_{\mathcal{A}}\left[\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)+\pi_\theta(s,\ a)\nabla_{\theta}Q^\pi(s,\ a)\right]da\\
 &=\int_{\mathcal{A}}\left[\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)+\pi_\theta(s,\ a)\nabla_{\theta}\left[r(s,\ a)+\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ a)V^{\pi}(s')ds'\right]\right]da\\
-&=\int_{\mathcal{A}}\left[\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)+\pi_\theta(s,\ a)\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ a)\nabla_{\theta}V^{\pi}(s')ds'\right]da\tag{1}\\
+&=\int_{\mathcal{A}}\left[\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)+\pi_\theta(s,\ a)\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ a)\nabla_{\theta}V^{\pi}(s')ds'\right]da\\
 &=\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)da+\int_{\mathcal{S}}\gamma \int_{\mathcal{A}}\pi_\theta(s,\ a)p(s\rightarrow s',\ 1,\ a)da\nabla_{\theta}V^{\pi}(s')ds'\\
 &=\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)da+\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \pi)\nabla_{\theta}V^{\pi}(s')ds'\\
-&=\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)da+\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \pi)\int_{\mathcal{A}}\left[\nabla_{\theta}\pi_\theta(s',\ a)Q^\pi(s',\ a)+\pi_\theta(s',\ a)\nabla_{\theta}Q^\pi(s',\ a)\right]dads'\\
-&=\int_{\mathcal{S}}\sum_{k=0}^1 \left[\gamma^kp(s\rightarrow s',\ k,\ \pi)\right]\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s',\ a)Q^\pi(s',\ a)dads'+\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \pi)\int_{\mathcal{S}}\gamma p(s'\rightarrow s'',\ 1,\ \pi)\nabla_{\theta}V^{\pi}(s'')ds''ds'\\
-&=\int_{\mathcal{S}}\sum_{k=0}^1 \left[\gamma^kp(s\rightarrow s',\ k,\ \pi)\right]\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s',\ a)Q^\pi(s',\ a)dads'+\int_{\mathcal{S}}\gamma^2 \int_{\mathcal{S}}p(s\rightarrow s',\ 1,\ \pi)p(s'\rightarrow s'',\ 1,\ \pi)ds'\nabla_{\theta}V^{\pi}(s'')ds''\\
-&=\int_{\mathcal{S}}\sum_{k=0}^1 \left[\gamma^kp(s\rightarrow s',\ k,\ \pi)\right]\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s',\ a)Q^\pi(s',\ a)dads'+\int_{\mathcal{S}}\gamma^2 p(s\rightarrow s'',\ 2,\ \pi)\nabla_{\theta}V^{\pi}(s'')ds''\\
+&=\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)da\\
+&+\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \pi)\int_{\mathcal{A}}\left[\nabla_{\theta}\pi_\theta(s',\ a)Q^\pi(s',\ a)+\pi_\theta(s',\ a)\nabla_{\theta}Q^\pi(s',\ a)\right]dads'\\
+&=\int_{\mathcal{S}}\sum_{k=0}^1 \left[\gamma^kp(s\rightarrow s',\ k,\ \pi)\right]\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s',\ a)Q^\pi(s',\ a)dads'\\
+&+\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \pi)\int_{\mathcal{S}}\gamma p(s'\rightarrow s'',\ 1,\ \pi)\nabla_{\theta}V^{\pi}(s'')ds''ds'\\
+&=\int_{\mathcal{S}}\sum_{k=0}^1 \left[\gamma^kp(s\rightarrow s',\ k,\ \pi)\right]\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s',\ a)Q^\pi(s',\ a)dads'\\
+&+\int_{\mathcal{S}}\gamma^2 \int_{\mathcal{S}}p(s\rightarrow s',\ 1,\ \pi)p(s'\rightarrow s'',\ 1,\ \pi)ds'\nabla_{\theta}V^{\pi}(s'')ds''\\
+&=\int_{\mathcal{S}}\sum_{k=0}^1 \left[\gamma^kp(s\rightarrow s',\ k,\ \pi)\right]\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s',\ a)Q^\pi(s',\ a)dads'\\
+&+\int_{\mathcal{S}}\gamma^2 p(s\rightarrow s'',\ 2,\ \pi)\nabla_{\theta}V^{\pi}(s'')ds''\\
 &=\int_{\mathcal{S}}\sum_{k=0}^\infty \left[\gamma^kp(s\rightarrow s',\ k,\ \pi)\right]\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s',\ a)Q^\pi(s',\ a)dads'
-\end{align}</script><p>其中$p(s\rightarrow s’,\ k,\ \pi)$为在策略$\pi_\theta$下从$s$开始经过k步到底$s’$的概率。另外在 (1) 处使用了莱布尼茨变限积分求导规则。因此有，</p>
+\end{split}\tag{1}</script><p>其中$p(s\rightarrow s’,\ k,\ \pi)$为在策略$\pi_\theta$下从$s$开始经过k步到底$s’$的概率。另外在 (1) 处使用了莱布尼茨变限积分求导规则。因此有，</p>
 <script type="math/tex; mode=display">
-\begin{align}
-\nabla_{\theta}J(\pi_{\theta})&=\nabla_{\theta}\int_\mathcal{S}p_1(s)V^\pi(s)ds\tag{2}\\
+\begin{split}
+\nabla_{\theta}J(\pi_{\theta})&=\nabla_{\theta}\int_\mathcal{S}p_1(s)V^\pi(s)ds\\
 &=\int_{\mathcal{S}}\left[\int_\mathcal{S}\sum_{k=0}^\infty\gamma^kp_1(s)p(s\rightarrow s',\ k,\ \pi)ds\right]\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s',\ a)Q^\pi(s',\ a)dads'\\
 &=\int_{\mathcal{S}}\rho^\pi(s)\int_{\mathcal{A}}\nabla_{\theta}\pi_\theta(s,\ a)Q^\pi(s,\ a)dads\\
 &=\int_{\mathcal{S}}\rho^\pi(s)\int_{\mathcal{A}}\pi_\theta(s,\ a)\frac{\nabla_{\theta}\pi_\theta(s,\ a)}{\pi_\theta(s,\ a)}Q^\pi(s,\ a)dads\\
 &=\int_{\mathcal{S}}\rho^\pi(s)\int_{\mathcal{A}}\pi_\theta(s,\ a)\nabla_{\theta}\log\pi_\theta(s,\ a)Q^\pi(s,\ a)dads\\
 &=\mathrm{E}_{s\sim\rho^{\pi},a\sim\pi_{\theta}}\left[\nabla_{\theta}\log\pi_{\theta}(s,\ a)Q^{\pi}(s,\ a)\right]
-\end{align}</script><p>另外在 (2) 处使用了莱布尼茨变限积分求导规则。</p>
+\end{split}\tag{2}</script><p>另外在 (2) 处使用了莱布尼茨变限积分求导规则。</p>
 <h3 id="2-Stochastic-Actor-Critic"><a href="#2-Stochastic-Actor-Critic" class="headerlink" title="2. Stochastic Actor-Critic"></a>2. Stochastic Actor-Critic</h3><p>i) $Q^{w}(s,\ a) =\nabla_{\theta}\log\pi_{\theta}(s,\ a)^{\mathrm{T}}w$ 并且 ii) 参数 $w$ 最小化了平方误差 $\epsilon^{2}(w)=\mathrm{E}_{s\sim\rho^{\pi}, a\sim\pi_{\theta}}[(Q^{w}(s,\ a)-Q^{\pi}(s,\ a))^{2}]$，下面的梯度是无偏的，</p>
 <script type="math/tex; mode=display">\nabla_{\theta}J(\pi_{\theta})=\mathrm{E}_{s\sim\rho^{\pi},a\sim\pi_{\theta}}\left[\nabla_{\theta}\log\pi_{\theta}(s,\ a)Q^{w}(s,\ a)\right]</script><p>$\it Proof.$<br>由于$w$ 最小化了平方误差 $\epsilon^{2}(w)=\mathrm{E}_{s\sim\rho^{\pi}}, a\sim\pi_{\theta}\left[(Q^{w}(s,\ a)-Q^{\pi}(s,\ a))^{2}\right]$，故，</p>
 <script type="math/tex; mode=display">
-\begin{align}
+\begin{split}
 &\int_{\mathcal{S}}\rho^\pi(s)\int_{\mathcal{A}}\pi_\theta(s,\ a)\left[Q^\pi(s,\ a)-Q^w(s,\ a)\right]\nabla_wQ^{w}(s,\ a)dads\\
 &=\mathrm{E}_{s\sim\rho^{\pi}, a\sim\pi_{\theta}}\left[\left(Q^\pi(s,\ a)-Q^w(s,\ a)\right)\nabla_wQ^{w}(s,\ a)\right]\\
 &=0
-\end{align}</script><p>由于$Q^{w}(s,\ a) =\nabla_{\theta}\log\pi_{\theta}(s,\ a)^{\mathrm{T}}w$，将$\nabla_w Q^w(s,\ a)=\nabla_{\theta}\log\pi_{\theta}(s,\ a)$带入上式得到，</p>
+\end{split}</script><p>由于$Q^{w}(s,\ a) =\nabla_{\theta}\log\pi_{\theta}(s,\ a)^{\mathrm{T}}w$，将$\nabla_w Q^w(s,\ a)=\nabla_{\theta}\log\pi_{\theta}(s,\ a)$带入上式得到，</p>
 <script type="math/tex; mode=display">\mathrm{E}_{s\sim\rho^{\pi}, a\sim\pi_{\theta}}\left[\log\pi_{\theta}(s,\ a)Q^\pi(s,\ a)\nabla_{\theta}\right]=\mathrm{E}_{s\sim\rho^{\pi}, a\sim\pi_{\theta}}\left[\log\pi_{\theta}(s,\ a)Q^w(s,\ a)\nabla_{\theta}\right]=\nabla_\theta J(\pi_\theta)</script><h3 id="3-Gradients-of-Deterministic-Policies"><a href="#3-Gradients-of-Deterministic-Policies" class="headerlink" title="3. Gradients of Deterministic Policies"></a>3. Gradients of Deterministic Policies</h3><script type="math/tex; mode=display">
-\begin{align}
+\begin{split}
 \displaystyle \nabla_{\theta}J(\mu_{\theta})&=\int_{\mathcal{S}}\rho^{\mu}(s)\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}\mathrm{d}s\\
 &=\mathrm{E}_{s\sim\rho^{\mu}}\left[\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}\right]
-\end{align}</script><p>$\it Proof.$上面的常规条件保证了下面都是可积分和可微分的，</p>
+\end{split}</script><p>$\it Proof.$上面的常规条件保证了下面都是可积分和可微分的，</p>
 <script type="math/tex; mode=display">
-\begin{align}
+\begin{split}
 \nabla_{\theta}V^{\mu_{\theta}}(s)&=\nabla_{\theta}Q^{\mu_{\theta}}(s,\ \mu_{\theta}(s))\\
 &=\nabla_{\theta}(r(s,\ \mu_{\theta}(s))+\int_{\mathcal{S}}\gamma p(s'|s,\ \mu_{\theta}(s))V^{\mu_{\theta}}(s')\mathrm{d}s')\\
 &=\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}r(s,\ a)|_{a=\mu_{\theta}(s)}+\nabla_{\theta}\int_{\mathcal{S}}\gamma p(s'|s,\ \mu_{\theta}(s))V^{\mu_{\theta}}(s')\mathrm{d}s'\\
 &=\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}r(s,\ a)|_{a=\mu_{\theta}(s)}\\
-&\ \ \ \ +\displaystyle \int_{\mathcal{S}}\gamma(p(s'|s,\ \mu_{\theta}(s))\nabla_{\theta}V^{\mu_{\theta}}(s')+\gamma\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}p(s'|s,\ a)|_{a=\mu_{\theta}(s)}V^{\mu_{\theta}}(s'))ds'\tag{3}\\
+&+\displaystyle \int_{\mathcal{S}}\gamma(p(s'|s,\ \mu_{\theta}(s))\nabla_{\theta}V^{\mu_{\theta}}(s')\\
+&+\gamma\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}p(s'|s,\ a)|_{a=\mu_{\theta}(s)}V^{\mu_{\theta}}(s'))ds'\\
 &=\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}\left(r(s,\ a)+\int_{\mathcal{S}}\gamma p(s'|s,\ a)V^{\mu_{\theta}}(s')\mathrm{d}s'\right)|_{a=\mu_{\theta}(s)}\\
-&\ \ \ \ +\int_{\mathcal{S}}\gamma p(s'|s,\ \mu_{\theta}(s))\nabla_{\theta}V^{\mu_{\theta}}(s')\mathrm{d}s'\\
+&+\int_{\mathcal{S}}\gamma p(s'|s,\ \mu_{\theta}(s))\nabla_{\theta}V^{\mu_{\theta}}(s')\mathrm{d}s'\\
 &=\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu_{\theta}}(s,\ a)|_{a=\mu_{\theta}(s)}+\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \mu_{\theta})\nabla_{\theta}V^{\mu_{\theta}}(s')\mathrm{d}s'.
-\end{align}</script><p>在 (3) 处使用了莱布尼茨变限积分求导规则。重复上面的过程得到，</p>
+\end{split}\tag{3}</script><p>在 (3) 处使用了莱布尼茨变限积分求导规则。重复上面的过程得到，</p>
 <script type="math/tex; mode=display">
-\begin{align}
+\begin{split}
 &=\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu_{\theta}}(s,\ a)|_{a=\mu_{\theta}(s)}\\
-&\ \ \ \ +\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \mu_{\theta})\nabla_{\theta}\mu_{\theta}(s')\nabla_{a}Q^{\mu_{\theta}}(s',\ a)|_{a=\mu_{\theta}(s')}\mathrm{d}s'\\
-&\ \ \ \ +\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \mu_{\theta})\int_{\mathcal{S}}\gamma p(s'\rightarrow s''\ 1,\ \mu_{\theta})\nabla_{\theta}V^{\mu_{\theta}}(s'')\mathrm{d}s''\mathrm{d}s'\\
+&+\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \mu_{\theta})\nabla_{\theta}\mu_{\theta}(s')\nabla_{a}Q^{\mu_{\theta}}(s',\ a)|_{a=\mu_{\theta}(s')}\mathrm{d}s'\\
+&+\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \mu_{\theta})\int_{\mathcal{S}}\gamma p(s'\rightarrow s''\ 1,\ \mu_{\theta})\nabla_{\theta}V^{\mu_{\theta}}(s'')\mathrm{d}s''\mathrm{d}s'\\
 &=\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu_{\theta}}(s,\ a)|_{a=\mu_{\theta}(s)}\\
-&\ \ \ \ +\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \mu_{\theta})\nabla_{\theta}\mu_{\theta}(s')\nabla_{a}Q^{\mu_{\theta}}(s',\ a)|_{a=\mu_{\theta}(s')}\mathrm{d}s'\\
-&\ \ \ \ +\displaystyle \int_{\mathcal{S}}\gamma^{2}p(s\rightarrow s',\ 2,\ \mu_{\theta})\nabla_{\theta}V^{\mu_{\theta}}(s')\mathrm{d}s'\tag{4}\\
-\vdots\\
+&+\int_{\mathcal{S}}\gamma p(s\rightarrow s',\ 1,\ \mu_{\theta})\nabla_{\theta}\mu_{\theta}(s')\nabla_{a}Q^{\mu_{\theta}}(s',\ a)|_{a=\mu_{\theta}(s')}\mathrm{d}s'\\
+&+\displaystyle \int_{\mathcal{S}}\gamma^{2}p(s\rightarrow s',\ 2,\ \mu_{\theta})\nabla_{\theta}V^{\mu_{\theta}}(s')\mathrm{d}s'\\
+&\vdots\\
 &=\int_{\mathcal{S}}\sum_{t=0}^{\infty}\gamma^{t}p(s\rightarrow s',\ t,\ \mu_{\theta})\nabla_{\theta}\mu_{\theta}(s')\nabla_{a}Q^{\mu_{\theta}}(s',\ a)|_{a=\mu_{\theta}(s')}\mathrm{d}s'.
-\end{align}</script><p>在 (4) 处使用了富比尼定理交换了积分次序。接下来，</p>
+\end{split}\tag{4}</script><p>在 (4) 处使用了富比尼定理交换了积分次序。接下来，</p>
 <script type="math/tex; mode=display">
-\begin{align}
+\begin{split}
 \nabla_{\theta}J(\mu_{\theta})&=\nabla_{\theta}\int_{\mathcal{S}}p_{1}(s)V^{\mu_{\theta}}(s)\mathrm{d}s\\
-&=\displaystyle \int_{\mathcal{S}}p_{1}(s)\nabla_{\theta}V^{\mu_{\theta}}(s)\mathrm{d}s \tag{5}\\
+&=\displaystyle \int_{\mathcal{S}}p_{1}(s)\nabla_{\theta}V^{\mu_{\theta}}(s)\mathrm{d}s\\
 &=\displaystyle \int_{\mathcal{S}}\int_{\mathcal{S}}\sum_{t=0}^{\infty}\gamma^{t}p_{1}(s)p(s\rightarrow s',\ t,\ \mu_{\theta})\nabla_{\theta}\mu_{\theta}(s')\nabla_{a}Q^{\mu_{\theta}}(s',\ a)|_{a=\mu_{\theta}(s)}ds'ds\\
 &=\displaystyle \int_{\mathcal{S}}\rho^{\mu_{\theta}}(s)\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu_{\theta}}(s,\ a)|_{a=\mu_{\theta}(s)}ds\\
 &=\mathrm{E}_{s\sim\rho^{\mu_\theta}}\left[\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu_\theta}(s,\ a)|_{a=\mu_{\theta}(s)}\right]
-\end{align}</script><p>在 (5) 处使用了莱布尼茨变限积分求导规则。</p>
+\end{split}\tag{5}</script><p>在 (5) 处使用了莱布尼茨变限积分求导规则。</p>
 <h3 id="4-Limit-of-the-Stochastic-Policy-Gradient"><a href="#4-Limit-of-the-Stochastic-Policy-Gradient" class="headerlink" title="4. Limit of the Stochastic Policy Gradient"></a>4. Limit of the Stochastic Policy Gradient</h3><h4 id="条件-B1"><a href="#条件-B1" class="headerlink" title="条件 B1:"></a>条件 B1:</h4><p>一个参数为 $\sigma$ 的函数 $\nu_{\sigma}$ 被称为在 $\mathcal{R}\subseteq \mathcal{A}$ 上的常规 delta近似要满足下面几个条件:</p>
 <p>1. 分布 $\nu_{\sigma}$ 收敛于delta分布，有性质: 当 $||\nabla_{a}f(a)||&lt;L&lt;\infty, \displaystyle \sup_{a}f(a)&lt;b&lt;\infty$，$\mathcal{F}$ 为 $L$-Lipschitz 和有界函数的分类:</p>
 <script type="math/tex; mode=display">
@@ -532,23 +538,23 @@
 <h4 id="引理1。"><a href="#引理1。" class="headerlink" title="引理1。"></a>引理1。</h4><p>当 $\mathcal{U}\times \mathcal{V}\subseteq \mathbb{R}^{n}\times \mathbb{R}^{n}$，并且 $\nu$ : $\mathcal{U}\times \mathcal{V}\rightarrow \mathbb{R}$ 在 $\mathcal{U}\times \mathcal{V}$上可微分。故有 $(A)\Leftrightarrow(B)\Rightarrow(C)$，</p>
 <p>(A) 对所有 $u\in \mathcal{U}, v\in \mathcal{V}$, $\delta\in \mathbb{R}^{n}$ 有 $u+\delta\in \mathcal{U}, v+\delta\in \mathcal{V}, \nu(u,\ v)=\nu(u+\delta,\ v+\delta)$。<br>(B) 存在函数 $\chi$ : $\mathbb{R}^{n}\rightarrow \mathbb{R}$ 有 $\nu(u,\ v)=\chi(u-v)$。<br>(C) $\nabla_{u}\nu(u,\ v)=-\nabla_{v}\nu(u,\ v)$，梯度处处存在。<br>另外，如果 $\mathcal{U}\times \mathcal{V}$ 是凸集，则有 $C\Rightarrow \mathrm{A}$。<br>引理${\it proof}$。<br>$\mathrm{A}\Rightarrow \mathrm{B}$: </p>
 <script type="math/tex; mode=display">
-\begin{align}
+\begin{split}
 \chi(u-v)&=\nu(u,\ u-(u-v))\\
 &=\nu(u,\ v)
-\end{align}</script><p>$\mathrm{B}\Rightarrow \mathrm{A}$:  </p>
+\end{split}</script><p>$\mathrm{B}\Rightarrow \mathrm{A}$:  </p>
 <script type="math/tex; mode=display">
-\begin{align}
+\begin{split}
 \nu(u,\ v)&=\chi(u-v)\\
 &=\chi((u+\delta)-(v+\delta))\\
 &=\nu(u+\delta,\ v+\delta)
-\end{align}</script><p>$\mathrm{B}\Rightarrow \mathrm{C}$: 令 $h(u,\ v)=u-v$ 根据链式法则，</p>
-<script type="math/tex; mode=display">\nabla_{u}u(u,\ v)=\nabla_{h}\chi(h)|_{h(u,v)}\nabla_{u}h(u,\ v)=\nabla_{h}\chi(h)|_{h(u,v)}= -\nabla_{h}\chi(h)|_{h(u,v)}\nabla_{v}h(u,\ v)=-\nabla_{v}\nu(u,\ v)</script><p>($\mathrm{C}$ 和凸集) $\Rightarrow \mathrm{A}$: 假设 $\mathcal{U}\times \mathcal{V}$ 是凸集。对任何 $(u,\ v)\in \mathcal{U}\times \mathcal{V}$, $\delta\in \mathbb{R}^{n}$, 有，</p>
+\end{split}</script><p>$\mathrm{B}\Rightarrow \mathrm{C}$: 令 $h(u,\ v)=u-v$ 根据链式法则，</p>
+<script type="math/tex; mode=display">\nabla_{u}u(u,\ v)\!=\!\nabla_{h}\chi(h)|_{h(u,v)}\!\nabla_{u}h(u,\ v)\!=\!\nabla_{h}\chi(h)|_{h(u,v)}\!=\! -\!\nabla_{h}\chi(h)|_{h(u,v)}\!\nabla_{v}h(u,\ v)\!=\!-\nabla_{v}\nu(u,\ v)</script><p>($\mathrm{C}$ 和凸集) $\Rightarrow \mathrm{A}$: 假设 $\mathcal{U}\times \mathcal{V}$ 是凸集。对任何 $(u,\ v)\in \mathcal{U}\times \mathcal{V}$, $\delta\in \mathbb{R}^{n}$, 有，</p>
 <script type="math/tex; mode=display">
-\begin{align}
+\begin{split}
 \langle\nabla_{(u,v)}\nu(u,\ v)\ ,\ (\delta,\ \delta)\rangle&=\langle\nabla_{u}\nu(u,\ v)\ ,\ \delta\rangle+\langle\nabla_{v}\nu(u,\ v)\ ,\ \delta\rangle\\
 &=\langle\nabla_{u}\nu(u,\ v)\ ,\ \delta\rangle-\langle\nabla_{u}\nu(u,\ v)\ ,\ \delta\rangle\\
 &=0
-\end{align}</script><p>因为 $\mathcal{U}\times \mathcal{V}$ 是凸集, 对任意 $A=(u,\ v)\in \mathcal{U}\times \mathcal{V}$ 和 $B=(u+\delta,\ v+\delta)\in \mathcal{U}\times \mathcal{V}$ 有直线连接 $A$ 和 $B$ ，这条直线式是完全包含在 $\mathcal{U}\times \mathcal{V}$中的。 因此 $\nu$ 沿着这条线就有 $\nu(A)=\nu(B)$。</p>
+\end{split}</script><p>因为 $\mathcal{U}\times \mathcal{V}$ 是凸集, 对任意 $A=(u,\ v)\in \mathcal{U}\times \mathcal{V}$ 和 $B=(u+\delta,\ v+\delta)\in \mathcal{U}\times \mathcal{V}$ 有直线连接 $A$ 和 $B$ ，这条直线式是完全包含在 $\mathcal{U}\times \mathcal{V}$中的。 因此 $\nu$ 沿着这条线就有 $\nu(A)=\nu(B)$。</p>
 <p><img src="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/Figure1.png" alt=""></p>
 <h4 id="引理2。"><a href="#引理2。" class="headerlink" title="引理2。"></a>引理2。</h4><p>1. 对于任意 $\pi,\ t,\ \displaystyle \sup_{s}p_{t}^{\pi}(s)&lt;b$。<br>2. 对于任意 $\pi, \displaystyle \sup_{s}\rho^{\pi}(s)&lt;b/(1-\gamma)$。<br>3. 对于任意 $\pi, \displaystyle \sup_{a,s}||\nabla_{a}Q^{\pi}(a,\ s)||&lt;c&lt;\infty$。<br>$\it Proof$. 1. 当 $t=1$ 常规条件 A.2, 当 $t\geq 1,$</p>
 <script type="math/tex; mode=display">
@@ -563,47 +569,50 @@
 <script type="math/tex; mode=display">\displaystyle \lim_{\sigma\downarrow 0}\sup_{s}|\rho^{\pi_{\mu_{\theta},\sigma}}(s)-\rho^{\pi_{\mu_{\theta},0}}(s)|=0</script><p>$\it Proof.$ 我们有 $\displaystyle \rho^{\pi}(s)=\sum_{t=1}^{\infty}\gamma^{t-1}p_{t}^{\pi}(s)$。显然有 $p_{1}^{\pi_{\mu_{\theta},\sigma}}(s)=p_{1}(s)=p_{1}^{\pi_{\mu_{\theta},0}}(s)$。对应 $\nu_{\sigma}$ 的定义，对应任意 $\epsilon_{1}&gt;0$ 存在 $\sigma^{*}$ 当 $\sigma&lt;\sigma^{*}$时，</p>
 <script type="math/tex; mode=display">\sup_{s}\left|\int\pi_{\mu_{\theta},\sigma}(a|s)p(s'|s,\ a)da-\int\pi_{\mu_{\theta},0}(a|s)p(s'|s,\ a)da\right|\leq\epsilon_{1}.</script><p>现在假设 $t\geq 1$ 时有</p>
 <script type="math/tex; mode=display">\sup_{s}\left|p_{t}^{\pi_{\mu_{\theta},\sigma}}(s)-p_{t}^{\pi_{\mu_{\theta},0}}(s)\right|\leq\epsilon_{2}(t)\ ,</script><p>则,</p>
-<script type="math/tex; mode=display">\begin{align}
-\sup_{s'}\left|p_{t+1}^{\pi_{\mu_{\theta},\sigma}}(s')-p_{t+1}^{\pi_{\mu_{\theta},0}}(s')\right|
+<script type="math/tex; mode=display">
+\begin{split}
+&\sup_{s'}\left|p_{t+1}^{\pi_{\mu_{\theta},\sigma}}(s')-p_{t+1}^{\pi_{\mu_{\theta},0}}(s')\right|\\
 &\leq\sup_{s'}\left|\int\int p_{t}^{\pi_{\mu_{\theta},\sigma}}(s)\pi_{\mu_{\theta},\sigma}(a|s)p(s'|s,\ a)dads-\int\int p_{t}^{\pi_{\mu_{\theta},0}}(s)\pi_{\mu_{\theta},0}(a|s)p(s'|s,\ a)dads\right|\\
 &\leq\sup_{s'}\int\left|p_{t}^{\pi_{\mu_{\theta},\sigma}}(s)-p_{t}^{\pi_{\mu_{\theta},0}}(s)\right|\int\pi_{\mu_{\theta},\sigma}(a|s)p(s'|s,\ a)dads\\
 &+\sup_{s'}\int p_{t}^{\pi_{\mu_{\theta},0}}(s)\left|\int\pi_{\mu_{\theta},\sigma}(a|s)p(s'|s,\ a)da-\int\pi_{\mu_{\theta},0}(a|s)p(s'|s,\ a)da\right|ds\\
 &\leq\epsilon_{2}(t)\int bds+\epsilon_{1}\\
 &=\epsilon_{2}(t)b\zeta+\epsilon_{1},
-\end{align}</script><p>这里 $\displaystyle \zeta=\int 1ds&lt;\infty$. 因为 $\epsilon_{2}(1)=0$ 有，</p>
+\end{split}</script><p>这里 $\displaystyle \zeta=\int 1ds&lt;\infty$. 因为 $\epsilon_{2}(1)=0$ 有，</p>
 <script type="math/tex; mode=display">\sup_{s}\left|p_{1}^{\pi_{\mu_{\theta},\sigma}}(s)-p_{1}^{\pi_{\mu_{\theta},0}}(s)\right|\leq 0\leq\epsilon_{1}</script><p>假设，</p>
 <script type="math/tex; mode=display">\sup_{s}\left|p_{t}^{\pi_{\mu_{\theta},\sigma}}(s)-p_{t}^{\pi_{\mu_{\theta},0}}(s)\right|\leq\epsilon_{1}(b\zeta+1)^{t-1}</script><p>t+1时，</p>
-<script type="math/tex; mode=display">\begin{align}
+<script type="math/tex; mode=display">
+\begin{split}
 \sup_{s}\left|p_{t+1}^{\pi_{\mu_{\theta},\sigma}}(s)-p_{t+1}^{\pi_{\mu_{\theta},0}}(s)\right|&\leq\epsilon_{1}(b\zeta+1)^{t-1}b\zeta+\epsilon_{1}\\
 &\leq\epsilon_{1}((b\zeta+1)^{t-1}b\zeta+1)\\
 &\leq\epsilon_{1}((b\zeta+1)^{t-1}b\zeta+(b\zeta+1)^{t-1})\\
 &\leq\epsilon_{1}(b\zeta+1)^{(t+1)-1}
-\end{align}</script><p>故有</p>
+\end{split}</script><p>故有</p>
 <script type="math/tex; mode=display">\sup_{s}\left|p_{t}^{\pi_{\mu_{\theta},\sigma}}(s)-p_{t}^{\pi_{\mu_{\theta},0}}(s)\right|\leq\epsilon_{1}(b\zeta+1)^{t-1}</script><p>对于任意 $\epsilon&gt;0$ 可以选择一个足够大的 $T$ 使得 $\displaystyle \sum_{t=T+1}^{\infty}\gamma^{t-1}b&lt;\epsilon/2$ 然后选择 $\sigma^{*}$ 使得 $\epsilon_{1}$ 足够小使得 $\displaystyle \sum_{t=1}^{T}\gamma^{t-1}\epsilon_{1}(b\zeta+1)^{t-1}&lt;\epsilon/2$, 这样对应任意 $\sigma&lt;\sigma^{*}$ 有，</p>
 <script type="math/tex; mode=display">
-\begin{align}
+\begin{split}
 \sup_{s}\left|\rho^{\pi_{\mu_{\theta},\sigma}}(s)-\rho^{\pi_{\mu_{\theta},0}}(s)\right|&=\sup_{s}\left|\sum_{t=1}^{\infty}\gamma^{t-1}p_{t}^{\pi_{\mu_{\theta},\sigma}}(s)-\sum_{t=1}^{\infty}\gamma^{t-1}p_{t}^{\pi_{\mu_{\theta},0}}(s)\right|\\
 &\leq\sum_{t=1}^{T}\gamma^{t-1}\sup_{s}\left|p_{t}^{\pi_{\mu_{\theta},\sigma}}(s)-p_{t}^{\pi_{\mu_{\theta},0}}(s)\right|\\
 &+\sum_{t=T+1}^{\infty}\gamma^{t-1}\sup_{s}\left|p_{t}^{\pi_{\mu_{\theta},\sigma}}(s)-p_{t}^{\pi_{\mu_{\theta},0}}(s)\right|\\
 &\leq\sum_{t=1}^{T}\gamma^{t-1}\epsilon_{1}(b\zeta+1)^{t-1}+\sum_{t=1}^{\infty}\gamma^{t-1}b\\
 &\leq\epsilon
-\end{align}</script><h4 id="引理-4"><a href="#引理-4" class="headerlink" title="引理 4."></a>引理 4.</h4><p>对于所有 $s\in S,\ \theta$，当 $\sigma\rightarrow 0$ 时 $\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(a,\ s)\rightarrow\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(a,\ s)$，并且在 $(s,\ a)$ 上一致收敛。</p>
+\end{split}</script><h4 id="引理-4"><a href="#引理-4" class="headerlink" title="引理 4."></a>引理 4.</h4><p>对于所有 $s\in S,\ \theta$，当 $\sigma\rightarrow 0$ 时 $\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(a,\ s)\rightarrow\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(a,\ s)$，并且在 $(s,\ a)$ 上一致收敛。</p>
 <script type="math/tex; mode=display">\lim_{\sigma\downarrow 0}\sup_{(s,a)}\left\|\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(a,\ s)-\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(a,\ s)\right\|=0</script><p>$Proof.$ $\displaystyle \nabla_{a}Q^{\pi}(a,\ s)=\nabla_{a}(r(s,\ a)+\gamma\int p(s’|s,\ a)V^{\pi}(s’)ds’)$ ，所以有，</p>
 <script type="math/tex; mode=display">
-\begin{align}
+\begin{split}
 \sup_{(s,a)}\left\|\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(a,\ s)-\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(a,\ s)\right\|&\leq\gamma\int\sup_{(s,s',a)}\left\|\nabla_{a}p(s'|s,\ a)\right\|\left|V^{\pi_{\mu_{\theta},\sigma}}(s')-V^{\pi_{\mu_{\theta},0}}(s')\right|ds'\\
 &\leq\gamma\zeta L\sup_{s'}\left|V^{\pi_{\mu_{\theta},\sigma}}(s')-V^{\pi_{\mu_{\theta},0}}(s')\right|
-\end{align}</script><p>这里 $\displaystyle \zeta=\int 1ds&lt;\infty$. 对任意 $\epsilon_{1}, \epsilon_{2}$ 存在 $\sigma^{*}$ 对所有 $\sigma&lt;\sigma^{*}$ 都有，</p>
+\end{split}</script><p>这里 $\displaystyle \zeta=\int 1ds&lt;\infty$. 对任意 $\epsilon_{1}, \epsilon_{2}$ 存在 $\sigma^{*}$ 对所有 $\sigma&lt;\sigma^{*}$ 都有，</p>
 <script type="math/tex; mode=display">\sup_{s}\left|\int r(s,\ a)(\pi_{\mu_{\theta},\sigma}(a|s)-\pi_{\mu_{\theta},0}(a|s))da\right|<\epsilon_{1}</script><p>和</p>
 <script type="math/tex; mode=display">\displaystyle \sup_{s,\hat{s}}\left|\rho_{\hat{s}}^{\pi_{\mu_{\theta},\sigma}}(s)-\rho_{\hat{s}}^{\pi_{\mu_{\theta},0}}(s)\right|<\epsilon_{2}</script><p>这里 $\rho_{\hat{s}}^{\pi}(s)$ 和 $\rho^{\pi}(s)$，相似，只是在 $t=1$ 时的分布是 $\displaystyle \int p(s|a,\hat{s})\pi(a|\hat{s})da$ 而不是 $p_{1}$。然后有，</p>
 <script type="math/tex; mode=display">
-\begin{align}
-\displaystyle \sup_{s'}\left|V^{\pi_{\mu_{\theta},\sigma}}(s')-V^{\pi_{\mu_{\theta},0}}(s')\right|&\leq\sup_{s'}\left|\int r(s',\ a)(\pi_{\mu_{\theta},\sigma}(a|s')-\pi_{\mu_{\theta},0}(a|s'))da\right|\\
-&\ \ \ \ +\displaystyle \gamma\sup_{s'}\left|\int\int\rho_{s'}^{\pi_{\mu_{\theta},\sigma}}(s)\pi_{\mu_{\theta},\sigma}(a|s)r(s,\ a)dads-\int\int\rho_{s'}^{\pi_{\mu_{\theta},0}}(s)\pi_{\mu_{\theta},0}(a|s)r(s,\ a)dads\right|\\
+\begin{split}
+&\sup_{s'}\left|V^{\pi_{\mu_{\theta},\sigma}}(s')-V^{\pi_{\mu_{\theta},0}}(s')\right|\\
+&\leq\sup_{s'}\left|\int r(s',\ a)(\pi_{\mu_{\theta},\sigma}(a|s')-\pi_{\mu_{\theta},0}(a|s'))da\right|\\
+&+\displaystyle \gamma\sup_{s'}\left|\int\int\rho_{s'}^{\pi_{\mu_{\theta},\sigma}}(s)\pi_{\mu_{\theta},\sigma}(a|s)r(s,\ a)dads-\int\int\rho_{s'}^{\pi_{\mu_{\theta},0}}(s)\pi_{\mu_{\theta},0}(a|s)r(s,\ a)dads\right|\\
 &\leq\epsilon_{1}+\sup_{s'}\int\int\left|\rho_{s'}^{\pi_{\mu_{\theta},\sigma}}(s)-\rho_{s'}^{\pi_{\mu_{\theta},0}}(s)\right|\left|r(s,\ a)\right|\pi_{\mu_{\theta},\sigma}(a|s)dads\\
-&\ \ \ \ +\left|\sup_{s'}\int\rho_{s'}^{\pi_{\mu_{\theta},0}}(s)\int r(s,\ a)(\pi_{\mu_{\theta},\sigma}(a|s)-\pi_{\mu_{\theta},0}(a|s))dads\right|\\
+&+\left|\sup_{s'}\int\rho_{s'}^{\pi_{\mu_{\theta},0}}(s)\int r(s,\ a)(\pi_{\mu_{\theta},\sigma}(a|s)-\pi_{\mu_{\theta},0}(a|s))dads\right|\\
 &\leq\epsilon_{1}+\epsilon_{2}\zeta b+\epsilon_{1}/(1-\gamma)
-\end{align}</script><p>其中，$\displaystyle \sup_{s}\int\rho^{\pi}(s)ds\leq\sum_{t=1}^{\infty}\gamma^{t-1}\sup_{s}\int p_{t}^{\pi}(s)ds\leq 1/(1-\gamma)$ 。最后要通过选择 $\sigma$ 就可以任意小。</p>
+\end{split}</script><p>其中，$\displaystyle \sup_{s}\int\rho^{\pi}(s)ds\leq\sum_{t=1}^{\infty}\gamma^{t-1}\sup_{s}\int p_{t}^{\pi}(s)ds\leq 1/(1-\gamma)$ 。最后要通过选择 $\sigma$ 就可以任意小。</p>
 <h4 id="证明极限要用到的定理总结："><a href="#证明极限要用到的定理总结：" class="headerlink" title="证明极限要用到的定理总结："></a>证明极限要用到的定理总结：</h4><p>B1条件：</p>
 <script type="math/tex; mode=display">
 \lim_{\sigma\downarrow 0}\int_{A}\nu_{\sigma}(a',\ a)f(a)da=f(a')</script><p>引理1:</p>
@@ -612,23 +621,24 @@
 <script type="math/tex; mode=display">
 \lim_{\sigma\downarrow 0}\sup_{(s,a)}\left\|\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(a,\ s)-\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(a,\ s)\right\|=0</script><h4 id="it-proof-理论。"><a href="#it-proof-理论。" class="headerlink" title="$\it proof$ 理论。"></a>$\it proof$ 理论。</h4><p>由于引理1中 $\nabla_{a’}\nu_{\sigma}(a’,\ a)|_{a’=\mu_{\theta}(s)}=-\nabla_{a}\nu_{\sigma}(\mu_{\theta}(s),\ a)$ . 所以有,</p>
 <script type="math/tex; mode=display">
-\begin{align}
-\displaystyle \int_{A}Q^{\pi_{\mu_{\theta,\sigma}}}(s,\ a)\nabla_{a'}\nu_{\sigma}(a',\ a)|_{a'=\mu_{\theta}(s)} da &=-\displaystyle \int_{A}Q^{\pi_{\mu_{\theta,\sigma}}}(s,\ a)\nabla_{a}\nu_{\sigma}(\mu_{\theta}(s),\ a)\mathrm{d}a\\
+\begin{split}
+&\int_{A}Q^{\pi_{\mu_{\theta,\sigma}}}(s,\ a)\nabla_{a'}\nu_{\sigma}(a',\ a)|_{a'=\mu_{\theta}(s)}da\\
+&=-\displaystyle \int_{A}Q^{\pi_{\mu_{\theta,\sigma}}}(s,\ a)\nabla_{a}\nu_{\sigma}(\mu_{\theta}(s),\ a)\mathrm{d}a\\
 &=\displaystyle \int_{C_{\mu_{\theta}(\mathrm{s})}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)\mathrm{d}a+ boundary\ terms\\
 &=\int_{C_{\mu_{\theta}(\mathrm{s})}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)\mathrm{d}a
-\end{align}</script><p>因为 $\nu_{\sigma}$ 在边界上消失了所以boundary terms为零。对于随机策略有，</p>
+\end{split}</script><p>因为 $\nu_{\sigma}$ 在边界上消失了所以boundary terms为零。对于随机策略有，</p>
 <script type="math/tex; mode=display">
-\begin{align}
+\begin{split}
 \displaystyle \lim_{\sigma\downarrow 0}\nabla_{\theta}J(\pi_{\mu_{\theta},\sigma})&=\lim_{\sigma\downarrow 0}\int_{\mathcal{S}}\rho^{\pi_{\mu_{\theta},\sigma}}(s)\int_{A}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nabla_{\theta}\pi_{\mu_{\theta},\sigma}(a|s)dads\\
 &=\displaystyle \lim_{\sigma\downarrow 0}\int_{\mathcal{S}}\rho^{\pi_{\mu_{\theta},\sigma}}(s)\int_{A}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nabla_{\theta}\mu_{\theta}(s)\nabla_{a'}\nu_{\sigma}(a',\ a)|_{a=\mu_{\theta}(s)}dads\\
 &=\displaystyle \lim_{\sigma\downarrow 0}\int_{\mathcal{S}}\rho^{\pi_{\mu_{\theta},\sigma}}(s)\nabla_{\theta}\mu_{\theta}(s)\int_{C_{\mu_{\theta}(s)}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)dads\\
-&=\displaystyle \int_{\mathcal{S}}\lim_{\sigma\downarrow 0}\rho^{\pi_{\mu_{\theta},\sigma}}(s)\nabla_{\theta}\mu_{\theta}(s)\int_{C_{\mu_{\theta}(s)}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)dads\tag{5}
-\end{align}</script><p>在 (5) 按照显著收敛理论交换了积分和极线。根据引理显著函数为,</p>
+&=\displaystyle \int_{\mathcal{S}}\lim_{\sigma\downarrow 0}\rho^{\pi_{\mu_{\theta},\sigma}}(s)\nabla_{\theta}\mu_{\theta}(s)\int_{C_{\mu_{\theta}(s)}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)dads
+\end{split}\tag{6}</script><p>在 (6) 按照显著收敛理论交换了积分和极线。根据引理显著函数为,</p>
 <script type="math/tex; mode=display">
-\begin{align}
+\begin{split}
 g_{\theta}(s)&=\sup_{\sigma}\{\rho^{\pi_{\mu_{\theta},\sigma}}(s)\}\sup_{a\in C_{\mu_{\theta}(s)},\sigma}\{\left\|\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(a,\ s)\right\|\}\left\|\nabla_{\theta}\mu_{\theta}(s)\right\|_{\mathrm{o}\mathrm{p}}\\
-&\displaystyle \geq\left\|\rho^{\pi_{\mu_{\theta},\sigma}}(s)\int_{C_{\mu_{\theta}(s)}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)\mathrm{d}a\nabla_{\theta}\mu_{\theta}(s)\right\|\tag{6}
-\end{align}</script><p>这里 $||\cdot||_{\mathrm{o}\mathrm{p}}$ 表示 operator norm, 或是最大的奇异值。<br>operator norm的定义: $\left|A\right|_{op}=\inf\{c\geq 0:\left|A\nu\right|\leq c\left|\nu\right|\ for\ all\ \nu\in\mathcal{V}\}$<br>引理4中证明了 $\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)$ 的一致收敛，对应任意 $\epsilon_{1}, \epsilon_{2}$ 存在 $\sigma^{<em>}$ 对应任意 $\sigma&lt;\sigma^{</em>}$ 有，</p>
+&\displaystyle \geq\left\|\rho^{\pi_{\mu_{\theta},\sigma}}(s)\int_{C_{\mu_{\theta}(s)}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)\mathrm{d}a\nabla_{\theta}\mu_{\theta}(s)\right\|
+\end{split}\tag{7}</script><p>这里 $||\cdot||_{\mathrm{o}\mathrm{p}}$ 表示 operator norm, 或是最大的奇异值。<br>operator norm的定义: $\left|A\right|_{op}=\inf\{c\geq 0:\left|A\nu\right|\leq c\left|\nu\right|\ for\ all\ \nu\in\mathcal{V}\}$<br>引理4中证明了 $\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)$ 的一致收敛，对应任意 $\epsilon_{1}, \epsilon_{2}$ 存在 $\sigma^{*}$ 对应任意 $\sigma&lt;\sigma^{*}$ 有，</p>
 <script type="math/tex; mode=display">
 \left\|\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)-\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(s,\ a)\right\|<\epsilon_{1}</script><p>所以有，</p>
 <script type="math/tex; mode=display">
@@ -638,19 +648,19 @@ g_{\theta}(s)&=\sup_{\sigma}\{\rho^{\pi_{\mu_{\theta},\sigma}}(s)\}\sup_{a\in C_
 <script type="math/tex; mode=display">
 \left\|\int_{C_{\mu_{\theta}(s)}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)\mathrm{d}a-\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(s,\ a)|_{a=\mu_{\theta}(s)}\right\|<\epsilon_{1}+\epsilon_{2}</script><p>从这里和引理3可以得到,</p>
 <script type="math/tex; mode=display">
-\begin{align}
-(5)&=\displaystyle \int_{\mathcal{S}}\rho^{\pi_{\mu_{\theta},0}}(s)\nabla_{\theta}\mu_{\theta}(s)\lim_{\sigma\downarrow 0}\int_{C_{\mu_{\theta}(s)}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)d{\it a}ds\\
+\begin{split}
+(6)&=\displaystyle \int_{\mathcal{S}}\rho^{\pi_{\mu_{\theta},0}}(s)\nabla_{\theta}\mu_{\theta}(s)\lim_{\sigma\downarrow 0}\int_{C_{\mu_{\theta}(s)}}\nabla_{a}Q^{\pi_{\mu_{\theta},\sigma}}(s,\ a)\nu_{\sigma}(\mu_{\theta}(s),\ a)d{\it a}ds\\
 &=\int_{\mathcal{S}}\rho^{\pi_{\mu_{\theta},0}}(s)\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\pi_{\mu_{\theta},0}}(s,\ a)|_{a=\mu_{\theta}(s)}\mathrm{d}s\\
 &=\int_{\mathcal{S}}\rho^{\mu_{\theta}}(s)\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu_{\theta}}(s,\ a)|_{a=\mu_{\theta}(s)}\mathrm{d}s
-\end{align}</script><h3 id="5-Compatible-Function-Approximation"><a href="#5-Compatible-Function-Approximation" class="headerlink" title="5. Compatible Function Approximation"></a>5. Compatible Function Approximation</h3><p>近似函数 $Q^{w}(s,\ a)$ 可兼容的条件，</p>
+\end{split}</script><h3 id="5-Compatible-Function-Approximation"><a href="#5-Compatible-Function-Approximation" class="headerlink" title="5. Compatible Function Approximation"></a>5. Compatible Function Approximation</h3><p>近似函数 $Q^{w}(s,\ a)$ 可兼容的条件，</p>
 <p>1. $\nabla_{a}Q^{w}(s,\ a)|_{a=\mu_{\theta}(s)}=\nabla_{\theta}\mu_{\theta}(s)^{\mathrm{T}}w$<br>2. $w$ 最小化了平方差 $MSE(\theta,\ w)= \mathrm{E}[\epsilon(s;\theta,\ w)^{\mathrm{T}}\epsilon(s;\theta,\ w)]$ 其中 $\epsilon(s;\theta,\ w) =\nabla_{a}Q^{w}(s,\ a)|_{a=\mu_{\theta}(s)}-\nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}$  </p>
 <p>$\it Proof$. 如果 $w$ 最小化了 $MSE$，这时 $\epsilon^{2}$ 相对于 $w$ 的梯度必须为零。又因为条件1有 $\nabla_{w}\epsilon(s;\theta,\ w)=\nabla_{\theta}\mu_{\theta}(s)$ ,</p>
 <script type="math/tex; mode=display">
-\begin{align}
+\begin{split}
 \nabla_{w}MSE(\theta,\ w)&=0\\
 \mathrm{E}[\nabla_{\theta}\mu_{\theta}(s)\epsilon(s;\theta,\ w)]&=0\\
 \mathrm{E}[\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{w}(s,\ a)|_{a=\mu_{\theta}(s)}]&=\\
-\mathrm{E}[\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}]&=\nabla_{\theta}J_{\beta}(\mu_{\theta})\ or\ \nabla_{\theta}J(\mu_{\theta})\end{align}</script><p>这时取 $Q^{w}(s,\ a)= (a-\mu_{\theta}(s))^{\mathrm{T}}\nabla_{\theta}\mu_{\theta}(s)^{\mathrm{T}}w+V^{v}(s)$ 能满足条件1。在使用Sarsa或Q-learning时有 $Q^{w}(s,\ a)\approx Q^{\mu}(s,\ a)$，因为平滑函数近似 $\nabla_{a}Q^{w}(s,\ a)|_{a=\mu_{\theta}(s)}\approx \nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}$。这样满足了条件2。</p>
+\mathrm{E}[\nabla_{\theta}\mu_{\theta}(s)\nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}]&=\nabla_{\theta}J_{\beta}(\mu_{\theta})\ or\ \nabla_{\theta}J(\mu_{\theta})\end{split}</script><p>这时取 $Q^{w}(s,\ a)= (a-\mu_{\theta}(s))^{\mathrm{T}}\nabla_{\theta}\mu_{\theta}(s)^{\mathrm{T}}w+V^{v}(s)$ 能满足条件1。在使用Sarsa或Q-learning时有 $Q^{w}(s,\ a)\approx Q^{\mu}(s,\ a)$，因为平滑函数近似 $\nabla_{a}Q^{w}(s,\ a)|_{a=\mu_{\theta}(s)}\approx \nabla_{a}Q^{\mu}(s,\ a)|_{a=\mu_{\theta}(s)}$。这样满足了条件2。</p>
 <h3 id="6-DDPG"><a href="#6-DDPG" class="headerlink" title="6. DDPG"></a>6. DDPG</h3><h4 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h4><p>1. 样本缓存池<br>2. 加目标网络，延迟更新：<br>$\theta^{Q’}\leftarrow\tau\theta^{Q}+(1-\tau)\theta^{Q’},\\<br>\theta^{\mu’}\leftarrow\tau\theta^{\mu}+(1-\tau)\theta^{\mu’}$<br>3. 加入探索噪声：<br>Ornstein-Uhlenbeck process，$dx_t=\theta(\mu-x_t)dt+\sigma dW_t$。这是一个随机微分函数。<br><img src="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/OrnsteinUhlenbeckProcess2D_svg.png" alt=""><br>其中$\theta=1.0,\ \sigma=300,\ \mu=(0,\ 0)$初始位置在$(10,\ 10)$。  </p>
 <p>4. 状态变量尺度不同：batch normalization<br>5. 用像素做输入。</p>
 <h4 id="伪代码"><a href="#伪代码" class="headerlink" title="伪代码"></a>伪代码</h4><p><img src="https://raw.githubusercontent.com/FrigEgg/Here/master/blogfile/Deterministic-Policy-Gradient-Algorithms/DDPG_algorithm.png" alt=""></p>
